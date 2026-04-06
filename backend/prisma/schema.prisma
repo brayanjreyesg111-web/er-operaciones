@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
+  descripcion String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usuarios    User[]
+
+  @@map("roles")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  nombre       String
+  email        String   @unique
+  passwordHash String
+  activo       Boolean  @default(true)
+  roleId       Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  role         Role     @relation(fields: [roleId], references: [id])
+
+  @@map("usuarios")
+}
+
+model Cliente {
+  id              Int       @id @default(autoincrement())
+  nombre          String
+  rtn             String?   @unique
+  contactoNombre  String?
+  telefono        String?
+  correo          String?
+  direccion       String?
+  ubicacion       String?
+  activo          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  maquinas        Maquina[]
+
+  @@map("clientes")
+}
+
+model Maquina {
+  id                Int       @id @default(autoincrement())
+  clienteId         Int
+  codigoInterno     String?
+  nombreEquipo      String
+  tipoEquipo        String?
+  marca             String?
+  modelo            String?
+  serie             String?
+  refrigerante      String?
+  cargaRefrigerante String?
+  ubicacion         String?
+  area              String?
+  observaciones     String?
+  activo            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  cliente           Cliente   @relation(fields: [clienteId], references: [id])
+
+  @@map("maquinas")
+}
