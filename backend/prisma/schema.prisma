@@ -31,24 +31,27 @@ model User {
   updatedAt    DateTime @updatedAt
 
   role         Role     @relation(fields: [roleId], references: [id])
+  visitas      Visita[]
 
   @@map("usuarios")
 }
 
 model Cliente {
-  id              Int       @id @default(autoincrement())
-  nombre          String
-  rtn             String?   @unique
-  contactoNombre  String?
-  telefono        String?
-  correo          String?
-  direccion       String?
-  ubicacion       String?
-  activo          Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  nombre           String
+  rtn              String?   @unique
+  contactoNombre   String?
+  telefono         String?
+  correo           String?
+  direccion        String?
+  ubicacion        String?
+  activo           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  maquinas        Maquina[]
+  maquinas         Maquina[]
+  ordenesServicio  OrdenServicio[]
+  visitas          Visita[]
 
   @@map("clientes")
 }
@@ -72,6 +75,69 @@ model Maquina {
   updatedAt         DateTime  @updatedAt
 
   cliente           Cliente   @relation(fields: [clienteId], references: [id])
+  visitas           VisitaMaquina[]
 
   @@map("maquinas")
+}
+
+model OrdenServicio {
+  id                  Int       @id @default(autoincrement())
+  clienteId           Int
+  numeroOrden         String    @unique
+  contactoNombre      String?
+  telefonoContacto    String?
+  correoContacto      String?
+  ubicacionServicio   String?
+  prioridad           String?
+  tipoSolicitud       String?
+  origenSolicitud     String?
+  descripcionProblema String
+  estado              String    @default("nueva")
+  fechaSolicitud      DateTime  @default(now())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  cliente             Cliente   @relation(fields: [clienteId], references: [id])
+  visitas             Visita[]
+
+  @@map("ordenes_servicio")
+}
+
+model Visita {
+  id                 Int       @id @default(autoincrement())
+  ordenServicioId    Int?
+  clienteId          Int
+  tecnicoId          Int
+  tipoVisita         String?
+  motivoVisita       String?
+  resultadoBreve     String?
+  estado             String    @default("pendiente")
+  requiereCotizacion Boolean   @default(false)
+  esVisitaLibre      Boolean   @default(false)
+  fechaVisita        DateTime  @default(now())
+  horaInicio         DateTime?
+  horaFin            DateTime?
+  observaciones      String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  ordenServicio      OrdenServicio? @relation(fields: [ordenServicioId], references: [id])
+  cliente            Cliente        @relation(fields: [clienteId], references: [id])
+  tecnico            User           @relation(fields: [tecnicoId], references: [id])
+  maquinas           VisitaMaquina[]
+
+  @@map("visitas")
+}
+
+model VisitaMaquina {
+  id         Int      @id @default(autoincrement())
+  visitaId   Int
+  maquinaId  Int
+  createdAt  DateTime @default(now())
+
+  visita     Visita   @relation(fields: [visitaId], references: [id])
+  maquina    Maquina  @relation(fields: [maquinaId], references: [id])
+
+  @@unique([visitaId, maquinaId])
+  @@map("visitas_maquinas")
 }
