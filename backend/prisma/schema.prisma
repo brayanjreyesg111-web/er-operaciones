@@ -32,6 +32,7 @@ model User {
 
   role         Role     @relation(fields: [roleId], references: [id])
   visitas      Visita[]
+  reportes     Reporte[]
 
   @@map("usuarios")
 }
@@ -52,6 +53,7 @@ model Cliente {
   maquinas         Maquina[]
   ordenesServicio  OrdenServicio[]
   visitas          Visita[]
+  reportes         Reporte[]
 
   @@map("clientes")
 }
@@ -76,6 +78,7 @@ model Maquina {
 
   cliente           Cliente   @relation(fields: [clienteId], references: [id])
   visitas           VisitaMaquina[]
+  reportesDetalle   ReporteDetalleMaquina[]
 
   @@map("maquinas")
 }
@@ -125,6 +128,7 @@ model Visita {
   cliente            Cliente        @relation(fields: [clienteId], references: [id])
   tecnico            User           @relation(fields: [tecnicoId], references: [id])
   maquinas           VisitaMaquina[]
+  reportes           Reporte[]
 
   @@map("visitas")
 }
@@ -140,4 +144,86 @@ model VisitaMaquina {
 
   @@unique([visitaId, maquinaId])
   @@map("visitas_maquinas")
+}
+
+model Reporte {
+  id                 Int       @id @default(autoincrement())
+  visitaId           Int
+  clienteId          Int
+  tecnicoId          Int
+  numeroReporte      String    @unique
+  tipoReporte        String?
+  conclusiones       String?
+  observaciones      String?
+  requiereCotizacion Boolean   @default(false)
+  estado             String    @default("borrador")
+  urlPdf             String?
+  urlCarpetaDrive    String?
+  fechaReporte       DateTime  @default(now())
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  visita             Visita    @relation(fields: [visitaId], references: [id])
+  cliente            Cliente   @relation(fields: [clienteId], references: [id])
+  tecnico            User      @relation(fields: [tecnicoId], references: [id])
+  detallesMaquinas   ReporteDetalleMaquina[]
+  anexos             Anexo[]
+  cierre             CierreReporte?
+
+  @@map("reportes")
+}
+
+model ReporteDetalleMaquina {
+  id               Int       @id @default(autoincrement())
+  reporteId        Int
+  maquinaId        Int
+  procedimiento    String?
+  diagnostico      String?
+  trabajoRealizado String?
+  recomendaciones  String?
+  psi              String?
+  amperaje         String?
+  observaciones    String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  reporte          Reporte   @relation(fields: [reporteId], references: [id])
+  maquina          Maquina   @relation(fields: [maquinaId], references: [id])
+
+  @@map("reportes_detalle_maquinas")
+}
+
+model Anexo {
+  id            Int       @id @default(autoincrement())
+  reporteId     Int?
+  tipoArchivo   String?
+  nombreArchivo String
+  urlArchivo    String
+  driveFileId   String?
+  mimeType      String?
+  tamanoBytes   Int?
+  createdAt     DateTime  @default(now())
+
+  reporte       Reporte?  @relation(fields: [reporteId], references: [id])
+
+  @@map("anexos")
+}
+
+model CierreReporte {
+  id                Int       @id @default(autoincrement())
+  reporteId         Int       @unique
+  recibido          Boolean   @default(false)
+  aprobado          Boolean?
+  nombreRecibe      String?
+  puestoRecibe      String?
+  urlFirma          String?
+  motivoNoRecepcion String?
+  observaciones     String?
+  fechaCierre       DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  reporte           Reporte   @relation(fields: [reporteId], references: [id])
+
+  @@map("cierres_reporte")
 }
