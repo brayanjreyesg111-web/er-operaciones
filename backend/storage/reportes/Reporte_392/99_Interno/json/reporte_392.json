@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "generadoEn": "2026-04-07T18:19:14.036Z",
+    "modulo": "reportes",
+    "version": 4
+  },
+  "reporte": {
+    "id": 28,
+    "numeroReporte": "392",
+    "visitaId": 1,
+    "clienteId": 1,
+    "tecnicoId": 2,
+    "maquinaId": 1,
+    "tipoUnidadId": 2,
+    "procedimientoId": null,
+    "tipoReporte": "individual",
+    "conclusiones": "Prueba con firma real backend",
+    "observaciones": "Validación de render de firma desde base64 real",
+    "psi": null,
+    "amperaje": null,
+    "requiereCotizacion": false,
+    "estado": "borrador",
+    "fechaReporte": "2026-04-07T18:19:11.192Z",
+    "createdAt": "2026-04-07T18:19:11.194Z",
+    "updatedAt": "2026-04-07T18:19:11.194Z",
+    "urlPdf": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\01_Entregable_Cliente\\Reporte_392.pdf"
+  },
+  "relaciones": {
+    "visita": {
+      "id": 1,
+      "ordenServicioId": 1,
+      "clienteId": 1,
+      "tecnicoId": 2,
+      "tipoVisita": "diagnostico",
+      "motivoVisita": "Primera revisión técnica de equipo de prueba",
+      "resultadoBreve": "Se realiza diagnóstico inicial del equipo.",
+      "estado": "atendida",
+      "requiereCotizacion": false,
+      "esVisitaLibre": false,
+      "fechaVisita": "2026-04-06T22:11:53.895Z",
+      "horaInicio": "2026-04-06T22:11:53.895Z",
+      "horaFin": "2026-04-06T22:11:53.895Z",
+      "observaciones": "Visita de prueba creada desde seed base.",
+      "createdAt": "2026-04-06T22:11:53.895Z",
+      "updatedAt": "2026-04-06T22:11:53.895Z"
+    },
+    "cliente": {
+      "id": 1,
+      "nombre": "CLIENTE DE PRUEBA ER",
+      "rtn": "08011999123456",
+      "contactoNombre": "Administración Cliente Prueba",
+      "telefono": "9999-9999",
+      "correo": "clienteprueba@er.local",
+      "direccion": "San Pedro Sula",
+      "ubicacion": "San Pedro Sula",
+      "activo": true,
+      "createdAt": "2026-04-06T22:05:24.921Z",
+      "updatedAt": "2026-04-06T22:05:24.921Z"
+    },
+    "tecnico": {
+      "id": 2,
+      "nombre": "Tecnico Prueba ER",
+      "email": "tecnico@er.local",
+      "passwordHash": "$2b$10$7o0BvQ0xw5j6P1qJgW9J0uF7qk9M3T1w8F2zB4M5n6P7q8R9s1T2u",
+      "activo": true,
+      "roleId": 3,
+      "createdAt": "2026-04-06T22:02:43.919Z",
+      "updatedAt": "2026-04-06T22:02:43.919Z"
+    },
+    "maquina": {
+      "id": 1,
+      "clienteId": 1,
+      "tipoUnidadId": 2,
+      "marcaId": 1,
+      "refrigeranteId": 1,
+      "codigoInterno": "MAQ-900",
+      "nombreEquipo": "Unidad de prueba LG 24K",
+      "tipoEquipo": "MINI SPLIT",
+      "marca": "LG",
+      "modelo": "Dual Inverter 24K",
+      "serie": "SERIE-PRUEBA-900",
+      "refrigerante": "R410A",
+      "cargaRefrigerante": "24,000 BTU",
+      "cargaRefrigeranteCantidad": "24000",
+      "cargaRefrigeranteUnidad": "BTU",
+      "ubicacion": "San Pedro Sula",
+      "area": "Área de prueba",
+      "observaciones": "Máquina de prueba para continuidad del proyecto.",
+      "activo": true,
+      "createdAt": "2026-04-06T22:10:36.989Z",
+      "updatedAt": "2026-04-06T22:10:36.989Z"
+    },
+    "tipoUnidad": {
+      "id": 2,
+      "codigo": "TU-002",
+      "nombre": "MINI_SPLIT_24000",
+      "descripcion": "Mini Split 24,000 BTU",
+      "activo": true,
+      "createdAt": "2026-04-06T22:06:04.109Z",
+      "updatedAt": "2026-04-06T22:06:04.109Z"
+    },
+    "procedimiento": null
+  },
+  "detallesMaquinas": [
+    {
+      "id": 27,
+      "reporteId": 28,
+      "maquinaId": 1,
+      "tipoUnidadId": 2,
+      "procedimientoId": null,
+      "procedimiento": null,
+      "tituloActividad": "Prueba firma backend",
+      "descripcionActividadPdf": "Se valida firma real enviada por body JSON",
+      "hallazgosTexto": null,
+      "diagnostico": "Equipo funcional",
+      "trabajoRealizado": "Prueba de PDF con firma real",
+      "recomendaciones": "Confirmar visualización de firma",
+      "psi": "73",
+      "amperaje": "12.7",
+      "observaciones": "Detalle con firma real",
+      "createdAt": "2026-04-07T18:19:11.220Z",
+      "updatedAt": "2026-04-07T18:19:11.220Z",
+      "maquina": {
+        "id": 1,
+        "clienteId": 1,
+        "tipoUnidadId": 2,
+        "marcaId": 1,
+        "refrigeranteId": 1,
+        "codigoInterno": "MAQ-900",
+        "nombreEquipo": "Unidad de prueba LG 24K",
+        "tipoEquipo": "MINI SPLIT",
+        "marca": "LG",
+        "modelo": "Dual Inverter 24K",
+        "serie": "SERIE-PRUEBA-900",
+        "refrigerante": "R410A",
+        "cargaRefrigerante": "24,000 BTU",
+        "cargaRefrigeranteCantidad": "24000",
+        "cargaRefrigeranteUnidad": "BTU",
+        "ubicacion": "San Pedro Sula",
+        "area": "Área de prueba",
+        "observaciones": "Máquina de prueba para continuidad del proyecto.",
+        "activo": true,
+        "createdAt": "2026-04-06T22:10:36.989Z",
+        "updatedAt": "2026-04-06T22:10:36.989Z"
+      },
+      "tipoUnidad": {
+        "id": 2,
+        "codigo": "TU-002",
+        "nombre": "MINI_SPLIT_24000",
+        "descripcion": "Mini Split 24,000 BTU",
+        "activo": true,
+        "createdAt": "2026-04-06T22:06:04.109Z",
+        "updatedAt": "2026-04-06T22:06:04.109Z"
+      },
+      "procedimientoCatalogo": null,
+      "hallazgos": [
+        {
+          "id": 24,
+          "reporteDetalleMaquinaId": 27,
+          "hallazgoCatalogoId": 1,
+          "codigoHallazgo": "H-03",
+          "descripcionHallazgo": "Hallazgo de prueba con firma real",
+          "createdAt": "2026-04-07T18:19:11.229Z",
+          "hallazgoCatalogo": {
+            "id": 1,
+            "codigo": "H-01",
+            "categoria": "Refrigeración",
+            "descripcion": "Presión fuera de rango.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        }
+      ]
+    }
+  ],
+  "anexos": [],
+  "cierre": {
+    "id": 22,
+    "reporteId": 28,
+    "recibido": true,
+    "aprobado": true,
+    "nombreRecibe": "Cliente Prueba",
+    "puestoRecibe": "Supervisor",
+    "urlFirma": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno\\firmas\\1775585951237_firma_real.png",
+    "motivoNoRecepcion": null,
+    "observaciones": "Recibido conforme",
+    "fechaCierre": "2026-04-07T18:19:11.239Z",
+    "createdAt": "2026-04-07T18:19:11.239Z",
+    "updatedAt": "2026-04-07T18:19:11.239Z"
+  },
+  "pdf": {
+    "rutaPdfInterno": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno\\pdf\\Reporte_392.pdf",
+    "rutaPdfEntregable": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\01_Entregable_Cliente\\Reporte_392.pdf"
+  },
+  "storage": {
+    "numeroReporte": "392",
+    "nombreCarpetaReporte": "Reporte_392",
+    "rutas": {
+      "baseStorageDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage",
+      "reportesBaseDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes",
+      "reporteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392",
+      "entregableClienteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\01_Entregable_Cliente",
+      "internoDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno",
+      "anexosDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno\\anexos",
+      "firmasDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno\\firmas",
+      "pdfDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno\\pdf",
+      "jsonDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_392\\99_Interno\\json"
+    },
+    "yaExistia": false
+  }
+}

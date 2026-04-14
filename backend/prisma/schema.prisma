@@ -15,7 +15,7 @@ model Role {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  usuarios    User[]
+  usuarios User[]
 
   @@map("roles")
 }
@@ -30,63 +30,208 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  role         Role     @relation(fields: [roleId], references: [id])
-  visitas      Visita[]
-  reportes     Reporte[]
+  role     Role      @relation(fields: [roleId], references: [id])
+  visitas  Visita[]
+  reportes Reporte[]
 
   @@map("usuarios")
 }
 
 model Cliente {
-  id               Int       @id @default(autoincrement())
-  nombre           String
-  rtn              String?   @unique
-  contactoNombre   String?
-  telefono         String?
-  correo           String?
-  direccion        String?
-  ubicacion        String?
-  activo           Boolean   @default(true)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id             Int      @id @default(autoincrement())
+  nombre         String
+  rtn            String?  @unique
+  contactoNombre String?
+  telefono       String?
+  correo         String?
+  direccion      String?
+  ubicacion      String?
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  maquinas         Maquina[]
-  ordenesServicio  OrdenServicio[]
-  visitas          Visita[]
-  reportes         Reporte[]
+  maquinas        Maquina[]
+  ordenesServicio OrdenServicio[]
+  visitas         Visita[]
+  reportes        Reporte[]
 
   @@map("clientes")
 }
 
-model Maquina {
-  id                Int       @id @default(autoincrement())
-  clienteId         Int
-  codigoInterno     String?
-  nombreEquipo      String
-  tipoEquipo        String?
-  marca             String?
-  modelo            String?
-  serie             String?
-  refrigerante      String?
-  cargaRefrigerante String?
-  ubicacion         String?
-  area              String?
-  observaciones     String?
-  activo            Boolean   @default(true)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+model TipoUnidad {
+  id          Int      @id @default(autoincrement())
+  codigo      String?  @unique
+  nombre      String   @unique
+  descripcion String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  cliente           Cliente   @relation(fields: [clienteId], references: [id])
-  visitas           VisitaMaquina[]
-  reportesDetalle   ReporteDetalleMaquina[]
+  maquinas         Maquina[]
+  marcasPermitidas MarcaTipoUnidad[]
+  reportes         Reporte[]
+  detallesReporte  ReporteDetalleMaquina[]
+
+  @@map("tipos_unidad")
+}
+
+model Marca {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @unique
+  descripcion String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  maquinas        Maquina[]
+  tiposPermitidos MarcaTipoUnidad[]
+
+  @@map("marcas")
+}
+
+model MarcaTipoUnidad {
+  id           Int      @id @default(autoincrement())
+  tipoUnidadId Int
+  marcaId      Int
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tipoUnidad TipoUnidad @relation(fields: [tipoUnidadId], references: [id])
+  marca      Marca      @relation(fields: [marcaId], references: [id])
+
+  @@unique([tipoUnidadId, marcaId])
+  @@map("marcas_tipos_unidad")
+}
+
+model Refrigerante {
+  id          Int      @id @default(autoincrement())
+  codigo      String   @unique
+  nombre      String
+  descripcion String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  maquinas Maquina[]
+
+  @@map("refrigerantes")
+}
+
+model UnidadMedidaCarga {
+  id          Int      @id @default(autoincrement())
+  codigo      String   @unique
+  nombre      String
+  descripcion String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  maquinas Maquina[]
+
+  @@map("unidades_medida_carga")
+}
+
+model Departamento {
+  id        Int      @id @default(autoincrement())
+  codigo    String   @unique
+  nombre    String   @unique
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ciudades Ciudad[]
+  maquinas Maquina[]
+
+  @@map("departamentos")
+}
+
+model Ciudad {
+  id             Int      @id @default(autoincrement())
+  departamentoId Int
+  codigo         String   @unique
+  nombre         String
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  departamento Departamento @relation(fields: [departamentoId], references: [id])
+  maquinas     Maquina[]
+
+  @@unique([departamentoId, nombre])
+  @@map("ciudades")
+}
+
+model Procedimiento {
+  id                     Int      @id @default(autoincrement())
+  codigo                 String   @unique
+  nombre                 String
+  descripcionCompletaPdf String?
+  activo                 Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  reportes        Reporte[]
+  detallesReporte ReporteDetalleMaquina[]
+
+  @@map("procedimientos")
+}
+
+model HallazgoCatalogo {
+  id          Int      @id @default(autoincrement())
+  codigo      String   @unique
+  categoria   String
+  descripcion String
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  detallesReporte ReporteDetalleHallazgo[]
+
+  @@map("hallazgos_catalogo")
+}
+
+model Maquina {
+  id                        Int      @id @default(autoincrement())
+  clienteId                 Int
+  tipoUnidadId              Int?
+  marcaId                   Int?
+  refrigeranteId            Int?
+  unidadMedidaCargaId       Int?
+  departamentoId            Int?
+  ciudadId                  Int?
+  codigoInterno             String?  @unique
+  tipoEquipo                String?
+  marca                     String?
+  modelo                    String?
+  serie                     String?
+  cargaRefrigeranteCantidad Decimal? @db.Decimal(10, 2)
+  direccionExacta           String?
+  area                      String?
+  observaciones             String?
+  activo                    Boolean  @default(true)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  cliente              Cliente            @relation(fields: [clienteId], references: [id])
+  tipoUnidad           TipoUnidad?        @relation(fields: [tipoUnidadId], references: [id])
+  marcaCatalogo        Marca?             @relation(fields: [marcaId], references: [id])
+  refrigeranteCatalogo Refrigerante?      @relation(fields: [refrigeranteId], references: [id])
+  unidadMedidaCarga    UnidadMedidaCarga? @relation(fields: [unidadMedidaCargaId], references: [id])
+  departamento         Departamento?      @relation(fields: [departamentoId], references: [id])
+  ciudad               Ciudad?            @relation(fields: [ciudadId], references: [id])
+
+  visitas          VisitaMaquina[]
+  reportesDetalle  ReporteDetalleMaquina[]
+  reportesCabecera Reporte[]               @relation("ReporteMaquinaCabecera")
 
   @@map("maquinas")
 }
 
 model OrdenServicio {
-  id                  Int       @id @default(autoincrement())
+  id                  Int      @id @default(autoincrement())
   clienteId           Int
-  numeroOrden         String    @unique
+  numeroOrden         String   @unique
   contactoNombre      String?
   telefonoContacto    String?
   correoContacto      String?
@@ -95,13 +240,13 @@ model OrdenServicio {
   tipoSolicitud       String?
   origenSolicitud     String?
   descripcionProblema String
-  estado              String    @default("nueva")
-  fechaSolicitud      DateTime  @default(now())
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  estado              String   @default("nueva")
+  fechaSolicitud      DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-  cliente             Cliente   @relation(fields: [clienteId], references: [id])
-  visitas             Visita[]
+  cliente Cliente  @relation(fields: [clienteId], references: [id])
+  visitas Visita[]
 
   @@map("ordenes_servicio")
 }
@@ -124,77 +269,109 @@ model Visita {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  ordenServicio      OrdenServicio? @relation(fields: [ordenServicioId], references: [id])
-  cliente            Cliente        @relation(fields: [clienteId], references: [id])
-  tecnico            User           @relation(fields: [tecnicoId], references: [id])
-  maquinas           VisitaMaquina[]
-  reportes           Reporte[]
+  ordenServicio OrdenServicio?  @relation(fields: [ordenServicioId], references: [id])
+  cliente       Cliente         @relation(fields: [clienteId], references: [id])
+  tecnico       User            @relation(fields: [tecnicoId], references: [id])
+  maquinas      VisitaMaquina[]
+  reportes      Reporte[]
 
   @@map("visitas")
 }
 
 model VisitaMaquina {
-  id         Int      @id @default(autoincrement())
-  visitaId   Int
-  maquinaId  Int
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  visitaId  Int
+  maquinaId Int
+  createdAt DateTime @default(now())
 
-  visita     Visita   @relation(fields: [visitaId], references: [id])
-  maquina    Maquina  @relation(fields: [maquinaId], references: [id])
+  visita  Visita  @relation(fields: [visitaId], references: [id])
+  maquina Maquina @relation(fields: [maquinaId], references: [id])
 
   @@unique([visitaId, maquinaId])
   @@map("visitas_maquinas")
 }
 
 model Reporte {
-  id                 Int       @id @default(autoincrement())
+  id                 Int      @id @default(autoincrement())
   visitaId           Int
   clienteId          Int
   tecnicoId          Int
-  numeroReporte      String    @unique
+  maquinaId          Int?
+  tipoUnidadId       Int?
+  procedimientoId    Int?
+  numeroReporte      String   @unique
   tipoReporte        String?
   conclusiones       String?
   observaciones      String?
-  requiereCotizacion Boolean   @default(false)
-  estado             String    @default("borrador")
+  psi                String?
+  amperaje           String?
+  requiereCotizacion Boolean  @default(false)
+  estado             String   @default("borrador")
   urlPdf             String?
   urlCarpetaDrive    String?
-  fechaReporte       DateTime  @default(now())
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  fechaReporte       DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  visita             Visita    @relation(fields: [visitaId], references: [id])
-  cliente            Cliente   @relation(fields: [clienteId], references: [id])
-  tecnico            User      @relation(fields: [tecnicoId], references: [id])
-  detallesMaquinas   ReporteDetalleMaquina[]
-  anexos             Anexo[]
-  cierre             CierreReporte?
+  visita        Visita         @relation(fields: [visitaId], references: [id])
+  cliente       Cliente        @relation(fields: [clienteId], references: [id])
+  tecnico       User           @relation(fields: [tecnicoId], references: [id])
+  maquina       Maquina?       @relation("ReporteMaquinaCabecera", fields: [maquinaId], references: [id])
+  tipoUnidad    TipoUnidad?    @relation(fields: [tipoUnidadId], references: [id])
+  procedimiento Procedimiento? @relation(fields: [procedimientoId], references: [id])
+
+  detallesMaquinas ReporteDetalleMaquina[]
+  anexos           Anexo[]
+  cierre           CierreReporte?
 
   @@map("reportes")
 }
 
 model ReporteDetalleMaquina {
-  id               Int       @id @default(autoincrement())
-  reporteId        Int
-  maquinaId        Int
-  procedimiento    String?
-  diagnostico      String?
-  trabajoRealizado String?
-  recomendaciones  String?
-  psi              String?
-  amperaje         String?
-  observaciones    String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                      Int      @id @default(autoincrement())
+  reporteId               Int
+  maquinaId               Int
+  tipoUnidadId            Int?
+  procedimientoId         Int?
+  procedimiento           String?
+  tituloActividad         String?
+  descripcionActividadPdf String?
+  hallazgosTexto          String?
+  diagnostico             String?
+  trabajoRealizado        String?
+  recomendaciones         String?
+  psi                     String?
+  amperaje                String?
+  observaciones           String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
-  reporte          Reporte   @relation(fields: [reporteId], references: [id])
-  maquina          Maquina   @relation(fields: [maquinaId], references: [id])
+  reporte               Reporte        @relation(fields: [reporteId], references: [id])
+  maquina               Maquina        @relation(fields: [maquinaId], references: [id])
+  tipoUnidad            TipoUnidad?    @relation(fields: [tipoUnidadId], references: [id])
+  procedimientoCatalogo Procedimiento? @relation(fields: [procedimientoId], references: [id])
+
+  hallazgos ReporteDetalleHallazgo[]
 
   @@map("reportes_detalle_maquinas")
 }
 
+model ReporteDetalleHallazgo {
+  id                      Int      @id @default(autoincrement())
+  reporteDetalleMaquinaId Int
+  hallazgoCatalogoId      Int
+  codigoHallazgo          String?
+  descripcionHallazgo     String?
+  createdAt               DateTime @default(now())
+
+  reporteDetalleMaquina ReporteDetalleMaquina @relation(fields: [reporteDetalleMaquinaId], references: [id])
+  hallazgoCatalogo      HallazgoCatalogo      @relation(fields: [hallazgoCatalogoId], references: [id])
+
+  @@map("reportes_detalle_hallazgos")
+}
+
 model Anexo {
-  id            Int       @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   reporteId     Int?
   tipoArchivo   String?
   nombreArchivo String
@@ -202,28 +379,28 @@ model Anexo {
   driveFileId   String?
   mimeType      String?
   tamanoBytes   Int?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime @default(now())
 
-  reporte       Reporte?  @relation(fields: [reporteId], references: [id])
+  reporte Reporte? @relation(fields: [reporteId], references: [id])
 
   @@map("anexos")
 }
 
 model CierreReporte {
-  id                Int       @id @default(autoincrement())
-  reporteId         Int       @unique
-  recibido          Boolean   @default(false)
+  id                Int      @id @default(autoincrement())
+  reporteId         Int      @unique
+  recibido          Boolean  @default(false)
   aprobado          Boolean?
   nombreRecibe      String?
   puestoRecibe      String?
   urlFirma          String?
   motivoNoRecepcion String?
   observaciones     String?
-  fechaCierre       DateTime  @default(now())
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  fechaCierre       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  reporte           Reporte   @relation(fields: [reporteId], references: [id])
+  reporte Reporte @relation(fields: [reporteId], references: [id])
 
   @@map("cierres_reporte")
 }
