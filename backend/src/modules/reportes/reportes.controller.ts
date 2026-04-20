@@ -3,32 +3,49 @@ import { reportesService } from "./reportes.service";
 
 async function crearReporte(req: Request, res: Response) {
   try {
-    const resultado = await reportesService.crearReporte(req.body);
-
-    return res.status(201).json(resultado);
-  } catch (error: any) {
-  console.error("ERROR REAL AL CREAR REPORTE:");
-  console.error(error);
-
-  return res.status(400).json({
-    ok: false,
-    mensaje: "Error al crear el reporte.",
-    error: error?.message ?? "Error desconocido",
-  });
-}
+    const result = await reportesService.crearReporte(req.body);
+    return res.status(201).json(result);
+  } catch (error) {
+    const mensaje =
+      error instanceof Error ? error.message : "No se pudo crear el reporte.";
+    return res.status(400).json({
+      ok: false,
+      mensaje,
+    });
   }
+}
 
+async function cerrarReporte(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: "ID de reporte inválido.",
+      });
+    }
+
+    const result = await reportesService.cerrarReporte(id, req.body);
+    return res.json(result);
+  } catch (error) {
+    const mensaje =
+      error instanceof Error ? error.message : "No se pudo guardar el cierre.";
+    return res.status(400).json({
+      ok: false,
+      mensaje,
+    });
+  }
+}
 
 async function listarReportes(_req: Request, res: Response) {
   try {
-    const resultado = await reportesService.listarReportes();
-
-    return res.status(200).json(resultado);
+    const result = await reportesService.listarReportes();
+    return res.json(result);
   } catch (error) {
     const mensaje =
-      error instanceof Error ? error.message : "Error al listar reportes.";
-
-    return res.status(500).json({
+      error instanceof Error ? error.message : "No se pudieron listar los reportes.";
+    return res.status(400).json({
       ok: false,
       mensaje,
     });
@@ -39,26 +56,19 @@ async function obtenerReportePorId(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!Number.isInteger(id) || id <= 0) {
       return res.status(400).json({
         ok: false,
-        mensaje: "El id del reporte no es válido.",
+        mensaje: "ID de reporte inválido.",
       });
     }
 
-    const resultado = await reportesService.obtenerReportePorId(id);
-
-    return res.status(200).json(resultado);
+    const result = await reportesService.obtenerReportePorId(id);
+    return res.json(result);
   } catch (error) {
     const mensaje =
-      error instanceof Error ? error.message : "Error al obtener el reporte.";
-
-    const statusCode =
-      error instanceof Error && error.message === "Reporte no encontrado."
-        ? 404
-        : 400;
-
-    return res.status(statusCode).json({
+      error instanceof Error ? error.message : "No se pudo obtener el reporte.";
+    return res.status(404).json({
       ok: false,
       mensaje,
     });
@@ -67,6 +77,7 @@ async function obtenerReportePorId(req: Request, res: Response) {
 
 export const reportesController = {
   crearReporte,
+  cerrarReporte,
   listarReportes,
   obtenerReportePorId,
 };

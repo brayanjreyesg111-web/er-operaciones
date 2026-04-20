@@ -2,8 +2,11 @@ import type { Request, Response } from "express";
 import {
   listarCiudadesPorDepartamento,
   listarDepartamentos,
+  listarHallazgos,
   listarMarcas,
+  listarProcedimientos,
   listarRefrigerantes,
+  listarTecnicos,
   listarTiposUnidad,
   listarUnidadesMedidaCarga,
 } from "./catalogos.service";
@@ -71,5 +74,35 @@ export async function listarCiudadesPorDepartamentoController(req: Request, res:
   } catch (error) {
     console.error("Error listando ciudades:", error);
     return res.status(500).json({ ok: false, mensaje: "No se pudieron listar las ciudades." });
+  }
+}
+
+export async function listarTecnicosController(_req: Request, res: Response) {
+  try {
+    const data = await listarTecnicos();
+    return res.json({ ok: true, data });
+  } catch (error) {
+    console.error("Error listando técnicos:", error);
+    return res.status(500).json({ ok: false, mensaje: "No se pudieron listar los técnicos." });
+  }
+}
+
+export async function listarProcedimientosController(_req: Request, res: Response) {
+  try {
+    const data = await listarProcedimientos();
+    return res.json({ ok: true, data });
+  } catch (error) {
+    console.error("Error listando procedimientos:", error);
+    return res.status(500).json({ ok: false, mensaje: "No se pudieron listar los procedimientos." });
+  }
+}
+
+export async function listarHallazgosController(_req: Request, res: Response) {
+  try {
+    const data = await listarHallazgos();
+    return res.json({ ok: true, data });
+  } catch (error) {
+    console.error("Error listando hallazgos:", error);
+    return res.status(500).json({ ok: false, mensaje: "No se pudieron listar los hallazgos." });
   }
 }

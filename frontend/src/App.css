@@ -1,624 +1,2241 @@
+:root {
+  color-scheme: light;
+  --bg: #eef4fa;
+  --surface: #ffffff;
+  --surface-soft: #f7fbff;
+  --line: #d7e4ef;
+  --line-strong: #c4d6e7;
+  --text: #10253b;
+  --muted: #56708a;
+  --navy: #0c3d6d;
+  --navy-deep: #082d52;
+  --cyan: #1697d5;
+  --green: #7ddb1e;
+  --orange: #ff8d22;
+  --orange-deep: #d46c00;
+  --danger: #c53b57;
+  --shadow: 0 18px 40px rgba(10, 39, 66, 0.08);
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
 
-:root {
-  --azul-principal: #0f2747;
-  --azul-secundario: #173967;
-  --azul-suave: #e8f0fa;
-  --texto: #102033;
-  --texto-suave: #5a6b7d;
-  --borde: #dbe5ef;
-  --fondo: #eef3f8;
-  --blanco: #ffffff;
+html {
+  scroll-behavior: smooth;
+  font-size: 13px;
 }
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: var(--fondo);
-  color: var(--texto);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.96rem;
+  line-height: 1.45;
 }
 
-.page {
+button,
+input,
+select,
+textarea,
+a {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  padding: 0.72rem 0.85rem;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(22, 151, 213, 0.65);
+  box-shadow: 0 0 0 4px rgba(22, 151, 213, 0.12);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.page,
+.portalShell {
   min-height: 100vh;
-  padding: 20px;
 }
 
-.container {
-  max-width: 1180px;
-  margin: 0 auto;
+.container,
+.publicLanding,
+.dashboardContainer,
+.dashboardTopbar {
+  width: min(1180px, calc(100% - 24px));
+  margin-inline: auto;
 }
 
-.panel {
-  background: var(--blanco);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 18px;
-  box-shadow: 0 10px 30px rgba(15, 39, 71, 0.08);
-  border: 1px solid var(--borde);
+.container,
+.dashboardContainer,
+.publicLanding {
+  padding-block: 12px 22px;
 }
 
-.heroPanel {
-  padding: 28px;
+.panel,
+.publicCard,
+.publicPanel,
+.kpiCard,
+.moduleCard,
+.dashboardHero,
+.dashboardUserCard,
+.authGlassCard,
+.comfortCard,
+.serviceFeatureCard,
+.requestSummaryCard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
 }
 
-.heroContent {
+.panel,
+.publicPanel,
+.moduleCard,
+.dashboardHero,
+.dashboardUserCard,
+.kpiCard,
+.requestSummaryCard {
+  padding: 14px;
+}
+
+.btn,
+.btnPortalPrincipal,
+.btnPortalSecundario,
+.navPortalButton,
+.portalMenuButton,
+.roleActionBtn,
+.publicNav a,
+.publicNav button,
+.noticeButton,
+.powerLogoutButton,
+.miniActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  padding: 0.72rem 0.9rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.btn:hover,
+.btnPortalPrincipal:hover,
+.btnPortalSecundario:hover,
+.navPortalButton:hover,
+.portalMenuButton:hover,
+.roleActionBtn:hover,
+.publicNav a:hover,
+.publicNav button:hover,
+.noticeButton:hover,
+.powerLogoutButton:hover,
+.miniActionButton:hover {
+  transform: translateY(-1px);
+}
+
+.btnPrimario,
+.btnPortalPrincipal,
+.navPortalButton,
+.noticeButton,
+.miniActionPrimary {
+  background: linear-gradient(180deg, #ff9e43 0%, var(--orange) 100%);
+  color: #fff;
+  box-shadow: 0 12px 22px rgba(255, 141, 34, 0.24);
+}
+
+.btnSecundario,
+.btnPortalSecundario,
+.publicNav a,
+.publicNav button,
+.portalMenuButton,
+.roleActionBtn,
+.btnGhost,
+.miniActionButton {
+  background: #edf4fb;
+  color: var(--navy);
+}
+
+.btnGhost {
+  border: 1px solid var(--line);
+}
+
+.heroBadge,
+.sectionCaption,
+.topbarEyebrow,
+.statusPill,
+.userRolePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.heroBadge,
+.heroBadgeSmall {
+  background: var(--navy);
+  color: #fff;
+  padding: 0.42rem 0.84rem;
+  font-size: 0.78rem;
+}
+
+.heroBadgeSmall {
+  margin-bottom: 10px;
+}
+
+.sectionCaption,
+.topbarEyebrow {
+  color: #5e7791;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.statusPill,
+.userRolePill {
+  padding: 10px 14px;
+  font-size: 0.82rem;
+}
+
+.statusPill {
+  background: #eef5ff;
+  color: var(--navy);
+  border: 1px solid #d8e6f4;
+}
+
+.userRolePill {
+  background: #fff4e7;
+  color: var(--orange-deep);
+  border: 1px solid #ffd6a9;
+}
+
+.errorBox,
+.mensajeSolicitud {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-weight: 700;
+}
+
+.errorBox {
+  background: #fff1f4;
+  border: 1px solid #f0c5cf;
+  color: #8c2740;
+}
+
+.mensajeSolicitud {
+  background: #eef8ef;
+  border: 1px solid #cfe6cf;
+  color: #1f632d;
+}
+
+.cleanList {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* Login */
+.authPage {
+  min-height: 100vh;
   display: grid;
-  grid-template-columns: 140px 1fr;
+  place-items: center;
+}
+
+.authWavePage {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(180deg, #0c3d6d 0%, #0a3258 100%);
+}
+
+.authWave {
+  position: absolute;
+  inset-inline: -10%;
+  border-radius: 48%;
+  opacity: 0.26;
+  animation: floatWave 14s linear infinite;
+}
+
+.authWaveOne {
+  bottom: -22%;
+  height: 45vh;
+  background: rgba(22, 151, 213, 0.32);
+}
+
+.authWaveTwo {
+  bottom: -27%;
+  height: 52vh;
+  background: rgba(125, 219, 30, 0.18);
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+.authWaveThree {
+  bottom: -30%;
+  height: 58vh;
+  background: rgba(255, 141, 34, 0.18);
+  animation-duration: 22s;
+}
+
+@keyframes floatWave {
+  0% { transform: translateX(-3%) rotate(0deg); }
+  50% { transform: translateX(4%) rotate(4deg); }
+  100% { transform: translateX(-3%) rotate(0deg); }
+}
+
+.authGlassCard {
+  position: relative;
+  z-index: 2;
+  width: min(430px, 100%);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.authLogoWrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px 24px 8px;
+}
+
+.authLogo {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
+}
+
+.authFormBody {
+  display: grid;
+  gap: 14px;
+  padding: 0 24px 24px;
+}
+
+.authFormBody h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.9rem;
+  color: var(--navy-deep);
+}
+
+.authFormBody label {
+  display: grid;
+  gap: 8px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.authSubmitButton {
+  margin-top: 4px;
+}
+
+.authBackLink {
+  text-align: center;
+  font-size: 0.88rem;
+  color: #68829c;
+}
+
+/* Public portal */
+.portalPublico {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f4f9fe 0%, #edf4fa 100%);
+}
+
+.publicHeader {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.publicBrand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.publicBrand img {
+  width: 74px;
+  height: 74px;
+  object-fit: contain;
+}
+
+.publicBrand h1,
+.publicBrand p,
+.publicHeroTextCard h2,
+.sectionTitleCenter h3,
+.moduleCard h3,
+.kpiCard p,
+.topbarEyebrow,
+.dashboardTopbar h1,
+.dashboardHero h2,
+.detalleTextoLargo,
+.detalleTextoPrelinea,
+.tituloPrincipal,
+.textoIntro {
+  margin: 0;
+}
+
+.publicBrand h1 {
+  color: var(--navy-deep);
+  font-size: 1.15rem;
+}
+
+.publicBrand p {
+  color: var(--muted);
+}
+
+.portalHamburger {
+  display: none;
+  min-width: 52px;
+}
+
+.publicNav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.publicLanding {
+  display: grid;
+  gap: 28px;
+}
+
+.publicHeroHome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.95fr);
   gap: 24px;
   align-items: center;
 }
 
-.logoEmpresa {
-  width: 140px;
-  max-width: 100%;
-  height: auto;
-  display: block;
-  background: #fff;
-  border-radius: 14px;
-  padding: 10px;
-  border: 1px solid var(--borde);
+.publicHeroTextCard,
+.publicHeroImageCard {
+  min-height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
 }
 
-.logoMini {
-  width: 68px;
-  height: auto;
-  display: block;
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px;
-  border: 1px solid var(--borde);
-}
-
-.tituloPrincipal {
-  margin: 0 0 8px 0;
-  font-size: 36px;
-  color: var(--azul-principal);
-}
-
-.subtituloPrincipal {
-  margin: 0 0 12px 0;
-  font-size: 18px;
-  color: #355179;
-}
-
-.textoIntro {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.7;
-  color: #45596f;
-}
-
-.formTopBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.formBrand {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.formBrand h2,
-.panel h3 {
-  margin: 0;
-  color: var(--azul-principal);
-}
-
-.formBrand p {
-  margin: 6px 0 0 0;
-  color: var(--texto-suave);
-}
-
-.bloqueFormulario {
-  border: 1px solid var(--borde);
-  border-radius: 18px;
-  padding: 20px;
-  margin-top: 18px;
-  background: #fbfdff;
-}
-
-.formGrid,
-.infoGrid {
+.publicHeroTextCard {
+  padding: 28px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
 }
 
-.campo {
+.publicHeroTextCard h2 {
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1.05;
+  color: var(--navy-deep);
+}
+
+.publicHeroTextCard p,
+.sectionTitleCenter p,
+.comfortCard p,
+.serviceFeatureCard p,
+.publicPanel p,
+.dashboardTopbar p,
+.kpiCard p,
+.moduleCard p,
+.textoAyuda,
+.subtleFormText,
+.publicCard p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.publicHeroImageCard {
+  overflow: hidden;
+  padding: 0;
+}
+
+.publicHeroImageCard img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+}
+
+.heroActions {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.publicSectionBlock {
+  display: grid;
+  gap: 18px;
+}
+
+.sectionTitleCenter {
+  text-align: center;
+  display: grid;
   gap: 8px;
 }
 
-.campo label {
+.sectionTitleCenterLeft {
+  text-align: left;
+}
+
+.sectionTitleCenter h3 {
+  font-size: clamp(1.3rem, 2.2vw, 2rem);
+  color: var(--navy-deep);
+}
+
+.comfortGrid,
+.servicesGridV2,
+.contactGrid,
+.kpiGrid,
+.dashboardGrid,
+.publicFormGrid,
+.formGrid,
+.infoGrid,
+.accionesGrid {
+  display: grid;
+  gap: 16px;
+}
+
+.comfortGrid,
+.contactGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.servicesGridV2 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.comfortCard,
+.serviceFeatureCard {
+  padding: 22px;
+  text-align: center;
+}
+
+.comfortCard h4,
+.serviceFeatureCard h4,
+.publicCard h4,
+.publicCard h3,
+.moduleCard h3,
+.dashboardHero h2,
+.kpiValue,
+.noticeBody h3,
+.bloqueFormulario h3,
+.panel h2,
+.panel h3 {
+  color: var(--navy-deep);
+  margin: 0 0 10px;
+}
+
+.comfortImagePlaceholder,
+.serviceFeatureIcon {
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #f6fbff 0%, #eef5fd 100%);
+  font-size: 1.9rem;
+  color: var(--cyan);
+  border: 1px solid var(--line);
+}
+
+.publicExpandableArea {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.publicAccordion {
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.publicAccordion summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  font-weight: 800;
+  color: var(--navy-deep);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.publicAccordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordionInnerPanel {
+  margin: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.publicFormGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.publicFormGrid label,
+.formGrid .campo,
+.authFormBody label {
+  display: grid;
+  gap: 8px;
   font-weight: 700;
-  color: #18314f;
+  color: var(--navy);
 }
 
-.campo input,
-.campo textarea,
-.campo select {
-  width: 100%;
-  border: 1px solid #cfd9e3;
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-size: 15px;
-  outline: none;
-  background: #fff;
-}
-
-.campo input:focus,
-.campo textarea:focus,
-.campo select:focus {
-  border-color: #1d4f91;
-  box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.12);
-}
-
+.publicFormFull,
 .campoCompleto,
 .fullRow {
   grid-column: 1 / -1;
 }
 
-.linkAction {
-  border: none;
-  background: transparent;
-  color: var(--azul-principal);
-  text-align: left;
-  padding: 0;
-  margin-top: 2px;
-  font-weight: 700;
-  cursor: pointer;
+.requestSummaryTrigger {
+  margin-top: 10px;
 }
 
-.linkAction:hover {
-  text-decoration: underline;
+.requestSummaryCard {
+  margin-top: 14px;
 }
 
-.accordionCategorias {
+.requestSummaryGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.requestSummaryGrid span {
+  display: block;
+  font-size: 0.82rem;
+  color: #647b93;
+  margin-bottom: 6px;
+}
+
+.requestSummaryGrid strong {
+  color: var(--navy-deep);
+}
+
+/* Dashboards */
+.roleShell {
+  background: linear-gradient(180deg, #f4f9fe 0%, #edf4fa 100%);
+}
+
+.dashboardTopbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 12px;
+  padding-bottom: 10px;
+}
+
+.dashboardTopbar h1 {
+  font-size: clamp(1.45rem, 2.2vw, 2.15rem);
+  color: var(--navy-deep);
+  margin-top: 4px;
+}
+
+.dashboardTopbarCompact {
+  align-items: center;
+}
+
+.powerLogoutButton {
+  background: linear-gradient(180deg, #113e6c 0%, #0a3055 100%);
+  color: #fff;
+  min-width: 138px;
+  box-shadow: 0 10px 18px rgba(10, 48, 85, 0.18);
+}
+
+.powerIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.roleDashboardContainer {
+  display: grid;
+  gap: 18px;
+}
+
+.roleActionBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 0 2px;
+}
+
+.roleActionBtn {
+  padding-inline: 14px;
+}
+
+.roleActionBtnPrimary {
+  background: linear-gradient(180deg, #ff9e43 0%, var(--orange) 100%);
+  color: #fff;
+}
+
+.dashboardHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 18px;
+}
+
+.roleHeroCard {
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+}
+
+.dashboardHeroText h2,
+.reportesDirectWrap .tituloPrincipal {
+  font-size: clamp(1.35rem, 2vw, 1.95rem);
+}
+
+.dashboardUserCard {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+}
+
+.dashboardUserCard strong {
+  font-size: 1.16rem;
+}
+
+.dashboardUserCard span {
+  color: #6a8198;
+  margin-top: 6px;
+}
+
+.kpiGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.kpiLabel {
+  color: #7288a0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpiValue {
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+}
+
+.roleDashboardGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.moduleCard {
+  min-height: 170px;
+}
+
+.moduleCardWide {
+  grid-column: span 2;
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.dataList {
+  display: grid;
+  gap: 12px;
+}
+
+.dataListItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f8fbfe;
+  border: 1px solid var(--line);
+}
+
+.dataListItem strong {
+  color: var(--navy-deep);
+}
+
+.dataListItem p {
+  margin: 6px 0 0;
+}
+
+.dataTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.compactItem {
+  display: grid;
+}
+
+.emptyBlock {
+  border-radius: 16px;
+  border: 1px dashed #c7d8e8;
+  padding: 14px 16px;
+  color: #7187a0;
+  background: #fafcff;
+}
+
+/* Forms & report flow */
+.reportesShellV2 {
+  background: linear-gradient(180deg, #f4f9fe 0%, #edf4fa 100%);
+}
+
+.reportLandingPanel {
+  display: grid;
   gap: 14px;
 }
 
+.compactFormPanel {
+  padding: 18px;
+}
+
+.compactOnlyFormBlock {
+  padding: 0;
+  box-shadow: none;
+  border: 0;
+}
+
+.formGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.bloqueFormulario {
+  padding: 16px 0;
+  border-bottom: 1px solid #ecf2f7;
+}
+
+.bloqueFormulario:last-of-type {
+  border-bottom: 0;
+}
+
+.barraAcciones,
+.accionesGrid,
+.barraAccionesFirma {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.miniActionButton {
+  margin-top: 10px;
+  padding: 0.72rem 0.9rem;
+  border-radius: 14px;
+  font-size: 0.92rem;
+}
+
+.accordionCategorias {
+  display: grid;
+  gap: 10px;
+}
+
 .categoriaBox {
-  border: 1px solid var(--borde);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.categoriaHeader {
+  width: 100%;
+  background: #f7fbff;
+  border: 0;
+  padding: 14px 16px;
+  font-weight: 800;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.categoriaContenido {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.hallazgoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.hallazgoItem input {
+  width: auto;
+  margin-top: 4px;
+}
+
+.hallazgoItem.activo {
+  border-color: rgba(22, 151, 213, 0.55);
+  background: #f5fbff;
+}
+
+.hallazgoItem p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.subtleFormText {
+  margin-bottom: 12px;
+}
+
+.textoAyuda {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+}
+
+.infoGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.fullRow {
+  grid-column: 1 / -1;
+}
+
+.detalleTextoLargo,
+.detalleTextoPrelinea {
+  color: var(--muted);
+}
+
+.detalleTextoPrelinea {
+  white-space: pre-line;
+}
+
+.listaHallazgos {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.firmaCanvasWrap {
+  border: 1px dashed var(--line-strong);
+  border-radius: 18px;
+  padding: 10px;
+  background: #fff;
+}
+
+.firmaCanvas {
+  width: 100%;
+  height: 110px;
+  display: block;
+  border-radius: 12px;
+  background: #fff;
+  touch-action: none;
+}
+
+.firmaBox {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.logoMini {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+/* Notification modal */
+.noticeOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 15, 28, 0.46);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.noticeCard {
+  width: min(520px, 100%);
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.18);
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.noticeIcon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+.notice-success .noticeIcon { background: #1c8e48; }
+.notice-error .noticeIcon { background: var(--danger); }
+.notice-warning .noticeIcon { background: var(--orange); }
+.notice-info .noticeIcon { background: var(--navy); }
+
+.noticeBody h3 {
+  margin-bottom: 8px;
+}
+
+.noticeBody p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.noticeButton {
+  justify-self: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 1180px) {
+  .publicHeroHome,
+  .dashboardHero,
+  .kpiGrid,
+  .comfortGrid,
+  .servicesGridV2,
+  .contactGrid,
+  .roleDashboardGrid,
+  .publicFormGrid,
+  .formGrid,
+  .infoGrid,
+  .requestSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .moduleCardWide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 860px) {
+  .portalHamburger {
+    display: inline-flex;
+  }
+
+  .publicNav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .publicNav.is-open {
+    display: flex;
+  }
+
+  .publicHeader {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  html {
+    font-size: 12px;
+  }
+
+  .container,
+  .publicLanding,
+  .dashboardContainer,
+  .dashboardTopbar,
+  .appShell {
+    width: min(100%, calc(100% - 14px));
+  }
+
+  .dashboardTopbar,
+  .dashboardTopbarCompact,
+  .moduleHeader,
+  .sectionHeading,
+  .heroActions,
+  .barraAcciones,
+  .accionesGrid,
+  .barraAccionesFirma {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn,
+  .btnPortalPrincipal,
+  .btnPortalSecundario,
+  .navPortalButton,
+  .roleActionBtn,
+  .publicNav a,
+  .publicNav button,
+  .powerLogoutButton,
+  .noticeButton {
+    width: 100%;
+  }
+
+  .noticeButton {
+    justify-self: stretch;
+  }
+
+  .publicHeroTextCard,
+  .publicHeroImageCard,
+  .panel,
+  .moduleCard,
+  .publicPanel,
+  .dashboardHero,
+  .dashboardUserCard,
+  .kpiCard,
+  .requestSummaryCard,
+  .compactFormPanel {
+    border-radius: 20px;
+  }
+
+  .publicHeroImageCard img {
+    min-height: 250px;
+  }
+}
+
+
+/* Portal trabajo actual */
+.appShell {
+  width: min(1180px, calc(100% - 24px));
+  margin: 0 auto;
+  padding: 12px 0 22px;
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.appShellDirect {
+  width: 100%;
+  padding: 0;
+  display: block;
+}
+
+.sidebar {
+  position: sticky;
+  top: 12px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(180deg, #0f3d6a 0%, #0a3055 100%);
+  border-radius: 18px;
+  box-shadow: 0 12px 22px rgba(10, 39, 66, 0.14);
+}
+
+.brandBox {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.brandLogo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px;
+}
+
+.brandTitle {
+  font-weight: 800;
+  color: #fff;
+}
+
+.brandSubtitle,
+.sidebarSectionLabel {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.86rem;
+}
+
+.sidebarSectionLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.navButton {
+  width: 100%;
+  justify-content: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5f9ff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 14px;
+  padding: 0.72rem 0.9rem;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.navButton:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.navButton.active {
+  background: linear-gradient(180deg, #ff9e43 0%, var(--orange) 100%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 14px 24px rgba(255, 141, 34, 0.22);
+}
+
+.content {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.contentDirect {
+  gap: 16px;
+}
+
+.directFlowHeader {
+  padding: 16px 18px;
+}
+
+.directFlowHeaderBrand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.directFlowLogo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 18px;
+  background: #f6fbff;
+  border: 1px solid var(--line);
+  padding: 10px;
+}
+
+.compactFormHeader {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.compactFormHeader h2,
+.directFlowHeader h2 {
+  margin: 0;
+  color: var(--navy-deep);
+  font-size: clamp(1.15rem, 1.8vw, 1.65rem);
+}
+
+.textoIntroCompacto {
+  margin: 0;
+  color: var(--muted);
+}
+
+.requiredDot {
+  color: var(--danger);
+  font-weight: 900;
+}
+
+@media (max-width: 960px) {
+  .appShell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+}
+
+
+/* =====================================
+   AJUSTE GLOBAL COMPACTO Y RESPONSIVE
+   Objetivo: que a zoom 100% se vea más cerca de una vista al 80%/67%
+   sin romper la estructura actual.
+===================================== */
+
+html {
+  font-size: 14px;
+}
+
+body {
+  line-height: 1.42;
+}
+
+.container,
+.publicLanding,
+.dashboardContainer,
+.dashboardTopbar,
+.appShell {
+  width: min(1180px, calc(100% - 24px));
+}
+
+.container,
+.dashboardContainer,
+.publicLanding {
+  padding-block: 12px 24px;
+}
+
+.publicHeader {
+  padding: 12px 14px;
+}
+
+.publicBrand img {
+  width: 58px;
+  height: 58px;
+}
+
+.publicBrand h1 {
+  font-size: 1.18rem;
+}
+
+input,
+select,
+textarea {
+  border-radius: 12px;
+  padding: 0.78rem 0.88rem;
+  font-size: 0.95rem;
+}
+
+.panel,
+.publicCard,
+.publicPanel,
+.kpiCard,
+.moduleCard,
+.dashboardHero,
+.dashboardUserCard,
+.authGlassCard,
+.comfortCard,
+.serviceFeatureCard,
+.requestSummaryCard {
+  border-radius: 18px;
+}
+
+.panel,
+.publicPanel,
+.moduleCard,
+.dashboardHero,
+.dashboardUserCard,
+.kpiCard,
+.requestSummaryCard,
+.comfortCard,
+.serviceFeatureCard {
+  padding: 16px;
+}
+
+.btn,
+.btnPortalPrincipal,
+.btnPortalSecundario,
+.navPortalButton,
+.portalMenuButton,
+.roleActionBtn,
+.publicNav a,
+.publicNav button,
+.noticeButton,
+.powerLogoutButton,
+.miniActionButton,
+.navButton {
+  border-radius: 13px;
+  padding: 0.74rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.heroBadge,
+.heroBadgeSmall,
+.sectionCaption,
+.topbarEyebrow,
+.statusPill,
+.userRolePill,
+.kpiLabel,
+.sidebarSectionLabel {
+  font-size: 0.74rem;
+}
+
+.dashboardTopbar {
+  gap: 14px;
+  padding-top: 14px;
+  padding-bottom: 10px;
+}
+
+.dashboardTopbar h1,
+.tituloPrincipal {
+  font-size: clamp(1.7rem, 2.5vw, 2.35rem);
+  line-height: 1.08;
+}
+
+.dashboardTopbar p,
+.publicHeroTextCard p,
+.sectionTitleCenter p,
+.comfortCard p,
+.serviceFeatureCard p,
+.publicPanel p,
+.kpiCard p,
+.moduleCard p,
+.textoAyuda,
+.subtleFormText,
+.publicCard p,
+.textoIntroCompacto,
+.detalleTextoLargo,
+.detalleTextoPrelinea,
+.cleanList,
+.listaHallazgos {
+  font-size: 0.96rem;
+  line-height: 1.52;
+}
+
+.publicHeroTextCard {
+  padding: 22px;
+}
+
+.publicHeroTextCard h2 {
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
+}
+
+.sectionTitleCenter h3,
+.dashboardHeroText h2,
+.reportesDirectWrap .tituloPrincipal,
+.compactFormHeader h2,
+.directFlowHeader h2 {
+  font-size: clamp(1.45rem, 2.4vw, 2.15rem);
+  line-height: 1.1;
+}
+
+.authLogo {
+  width: 88px;
+  height: 88px;
+}
+
+.authFormBody {
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.authFormBody h1 {
+  font-size: 1.6rem;
+}
+
+.roleActionBar {
+  gap: 10px;
+  padding: 8px 0 0;
+}
+
+.roleActionBtn {
+  min-height: 44px;
+}
+
+.dashboardHero {
+  gap: 14px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(230px, 0.8fr);
+}
+
+.dashboardUserCard strong {
+  font-size: 1.05rem;
+}
+
+.dashboardUserCard span {
+  margin-top: 4px;
+  font-size: 0.94rem;
+}
+
+.kpiGrid,
+.dashboardGrid,
+.roleDashboardGrid,
+.formGrid,
+.infoGrid,
+.publicFormGrid,
+.contactGrid,
+.comfortGrid,
+.servicesGridV2,
+.requestSummaryGrid {
+  gap: 12px;
+}
+
+.kpiValue {
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+}
+
+.moduleCard {
+  min-height: 180px;
+}
+
+.moduleHeader {
+  margin-bottom: 10px;
+}
+
+.dataList {
+  gap: 10px;
+}
+
+.dataListItem {
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 14px;
+}
+
+.emptyBlock {
+  border-radius: 14px;
+  padding: 12px 13px;
+}
+
+.bloqueFormulario {
+  padding: 12px 0;
+}
+
+.compactFormPanel,
+.directFlowHeader {
+  padding: 14px;
+}
+
+.compactFormHeader {
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.firmaCanvasWrap,
+.firmaBox,
+.categoriaBox,
+.hallazgoItem {
+  border-radius: 14px;
+}
+
+.sidebar {
+  top: 12px;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.brandBox {
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.brandLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+.brandTitle {
+  font-size: 0.98rem;
+}
+
+.navButton {
+  padding: 0.78rem 0.88rem;
+}
+
+.appShell {
+  padding: 12px 0 22px;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.content {
+  gap: 14px;
+}
+
+.contentDirect {
+  gap: 12px;
+}
+
+.directFlowLogo {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  padding: 8px;
+}
+
+.noticeCard {
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.noticeIcon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 1024px) {
+  html {
+    font-size: 13px;
+  }
+
+  .container,
+  .publicLanding,
+  .dashboardContainer,
+  .dashboardTopbar,
+  .appShell {
+    width: min(100%, calc(100% - 18px));
+  }
+
+  .appShell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  html {
+    font-size: 12px;
+  }
+
+  .container,
+  .publicLanding,
+  .dashboardContainer,
+  .dashboardTopbar,
+  .appShell {
+    width: min(100%, calc(100% - 14px));
+  }
+
+  .publicHeader {
+    padding: 10px 12px;
+  }
+
+  .panel,
+  .publicCard,
+  .publicPanel,
+  .kpiCard,
+  .moduleCard,
+  .dashboardHero,
+  .dashboardUserCard,
+  .authGlassCard,
+  .comfortCard,
+  .serviceFeatureCard,
+  .requestSummaryCard,
+  .compactFormPanel,
+  .directFlowHeader,
+  .sidebar {
+    border-radius: 16px;
+  }
+
+  .dashboardTopbar,
+  .dashboardTopbarCompact,
+  .moduleHeader,
+  .sectionHeading,
+  .heroActions,
+  .barraAcciones,
+  .accionesGrid,
+  .barraAccionesFirma,
+  .directFlowHeaderBrand {
+    gap: 10px;
+  }
+
+  .powerLogoutButton,
+  .btn,
+  .btnPortalPrincipal,
+  .btnPortalSecundario,
+  .navPortalButton,
+  .roleActionBtn,
+  .publicNav a,
+  .publicNav button,
+  .noticeButton,
+  .miniActionButton,
+  .navButton {
+    width: 100%;
+  }
+}
+
+
+/* === Compactación global fuerte · 2026-04-19 === */
+html {
+  font-size: 12px;
+}
+
+body {
+  font-size: 0.92rem;
+  line-height: 1.38;
+}
+
+.container,
+.publicLanding,
+.dashboardContainer,
+.dashboardTopbar,
+.appShell {
+  width: min(1120px, calc(100% - 18px));
+}
+
+.container,
+.dashboardContainer,
+.publicLanding,
+.appShell {
+  padding-block: 8px 16px;
+}
+
+.publicHeader {
+  padding: 10px 12px;
+}
+
+.publicBrand img {
+  width: 52px;
+  height: 52px;
+}
+
+.publicBrand h1 {
+  font-size: 1.05rem;
+}
+
+input,
+select,
+textarea {
+  border-radius: 10px;
+  padding: 0.6rem 0.74rem;
+  font-size: 0.9rem;
+}
+
+.panel,
+.publicCard,
+.publicPanel,
+.kpiCard,
+.moduleCard,
+.dashboardHero,
+.dashboardUserCard,
+.authGlassCard,
+.comfortCard,
+.serviceFeatureCard,
+.requestSummaryCard,
+.compactFormPanel,
+.directFlowHeader,
+.sidebar {
+  border-radius: 14px;
+}
+
+.panel,
+.publicPanel,
+.moduleCard,
+.dashboardHero,
+.dashboardUserCard,
+.kpiCard,
+.requestSummaryCard,
+.comfortCard,
+.serviceFeatureCard,
+.compactFormPanel,
+.directFlowHeader {
+  padding: 12px;
+}
+
+.btn,
+.btnPortalPrincipal,
+.btnPortalSecundario,
+.navPortalButton,
+.portalMenuButton,
+.roleActionBtn,
+.publicNav a,
+.publicNav button,
+.noticeButton,
+.powerLogoutButton,
+.miniActionButton,
+.navButton {
+  border-radius: 11px;
+  padding: 0.58rem 0.76rem;
+  font-size: 0.88rem;
+  gap: 6px;
+}
+
+.heroBadge,
+.heroBadgeSmall,
+.sectionCaption,
+.topbarEyebrow,
+.statusPill,
+.userRolePill,
+.kpiLabel,
+.sidebarSectionLabel {
+  font-size: 0.68rem;
+}
+
+.statusPill,
+.userRolePill {
+  padding: 7px 10px;
+}
+
+.dashboardTopbar {
+  gap: 10px;
+  padding-top: 8px;
+  padding-bottom: 6px;
+}
+
+.dashboardTopbar h1,
+.tituloPrincipal {
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  line-height: 1.04;
+  margin-top: 2px;
+}
+
+.dashboardTopbar p,
+.publicHeroTextCard p,
+.sectionTitleCenter p,
+.comfortCard p,
+.serviceFeatureCard p,
+.publicPanel p,
+.kpiCard p,
+.moduleCard p,
+.textoAyuda,
+.subtleFormText,
+.publicCard p,
+.textoIntroCompacto,
+.detalleTextoLargo,
+.detalleTextoPrelinea,
+.cleanList,
+.listaHallazgos,
+.dashboardUserCard span {
+  font-size: 0.88rem;
+  line-height: 1.42;
+}
+
+.publicHeroTextCard {
+  padding: 16px;
+}
+
+.publicHeroTextCard h2 {
+  font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+}
+
+.sectionTitleCenter h3,
+.dashboardHeroText h2,
+.reportesDirectWrap .tituloPrincipal,
+.compactFormHeader h2,
+.directFlowHeader h2,
+.panel h2,
+.panel h3,
+.moduleCard h3,
+.bloqueFormulario h3 {
+  font-size: clamp(1.1rem, 1.8vw, 1.55rem);
+  line-height: 1.06;
+  margin-bottom: 8px;
+}
+
+.authLogo {
+  width: 74px;
+  height: 74px;
+}
+
+.authFormBody {
+  gap: 10px;
+  padding: 0 16px 16px;
+}
+
+.authFormBody h1 {
+  font-size: 1.35rem;
+}
+
+.roleActionBar {
+  gap: 8px;
+  padding: 4px 0 0;
+}
+
+.roleActionBtn,
+.navButton,
+.powerLogoutButton {
+  min-height: 40px;
+}
+
+.dashboardHero {
+  gap: 10px;
+  grid-template-columns: minmax(0, 1.28fr) minmax(220px, 0.72fr);
+}
+
+.dashboardUserCard strong {
+  font-size: 0.98rem;
+}
+
+.kpiGrid,
+.dashboardGrid,
+.roleDashboardGrid,
+.formGrid,
+.infoGrid,
+.publicFormGrid,
+.contactGrid,
+.comfortGrid,
+.servicesGridV2,
+.requestSummaryGrid,
+.content,
+.contentDirect {
+  gap: 10px;
+}
+
+.kpiCard {
+  min-height: 122px;
+}
+
+.kpiValue {
+  font-size: clamp(1.15rem, 1.7vw, 1.55rem);
+}
+
+.moduleCard {
+  min-height: 150px;
+}
+
+.moduleHeader {
+  margin-bottom: 8px;
+}
+
+.dataList {
+  gap: 8px;
+}
+
+.dataListItem {
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 12px;
+}
+
+.emptyBlock {
+  border-radius: 12px;
+  padding: 10px 11px;
+}
+
+.bloqueFormulario {
+  padding: 10px 0;
+}
+
+.compactFormPanel,
+.directFlowHeader {
+  padding: 12px;
+}
+
+.compactFormHeader {
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.sidebar {
+  top: 8px;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 14px;
+}
+
+.brandBox {
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.brandLogo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.brandTitle {
+  font-size: 0.9rem;
+}
+
+.navButton {
+  padding: 0.62rem 0.72rem;
+}
+
+.appShell {
+  padding: 8px 0 16px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.directFlowLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  padding: 7px;
+}
+
+.logoMini {
+  width: 34px;
+  height: 34px;
+}
+
+.noticeCard {
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.noticeIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+@media (max-width: 1180px) {
+  html {
+    font-size: 11.5px;
+  }
+
+  .container,
+  .publicLanding,
+  .dashboardContainer,
+  .dashboardTopbar,
+  .appShell {
+    width: min(100%, calc(100% - 14px));
+  }
+
+  .appShell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  html {
+    font-size: 10.8px;
+  }
+
+  .container,
+  .publicLanding,
+  .dashboardContainer,
+  .dashboardTopbar,
+  .appShell {
+    width: min(100%, calc(100% - 10px));
+  }
+
+  .dashboardTopbar,
+  .dashboardTopbarCompact,
+  .moduleHeader,
+  .sectionHeading,
+  .heroActions,
+  .barraAcciones,
+  .accionesGrid,
+  .barraAccionesFirma,
+  .directFlowHeaderBrand {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .powerLogoutButton,
+  .btn,
+  .btnPortalPrincipal,
+  .btnPortalSecundario,
+  .navPortalButton,
+  .roleActionBtn,
+  .publicNav a,
+  .publicNav button,
+  .noticeButton,
+  .miniActionButton,
+  .navButton {
+    width: 100%;
+  }
+}
+
+/* Fix visual · Hallazgos checklist en reporte */
+.sectionHeaderSplit {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sectionMiniHelp {
+  margin: 0;
+  max-width: 420px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.hallazgosWrap {
+  display: grid;
+  gap: 10px;
+}
+
+.hallazgoCategoriaCard {
+  border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
   background: #fff;
 }
 
-.categoriaHeader {
+.hallazgoCategoriaHeader {
   width: 100%;
-  border: none;
-  background: #f4f8fc;
-  color: var(--azul-principal);
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 18px;
-  font-size: 15px;
-  font-weight: 700;
+  gap: 10px;
+  border: 0;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef5fd 100%);
+  color: var(--navy-deep);
+  padding: 0.9rem 1rem;
+  font-weight: 800;
+  font-size: 0.98rem;
   cursor: pointer;
-  text-align: left;
+  border-bottom: 1px solid var(--line);
 }
 
-.categoriaHeader:hover {
-  background: #eaf2fb;
+.hallazgoCategoriaHeader:hover {
+  background: linear-gradient(180deg, #f2f8ff 0%, #e9f2fc 100%);
 }
 
-.categoriaContenido {
-  padding: 16px;
-  border-top: 1px solid var(--borde);
-}
-
-.checkGrid {
+.hallazgoCategoriaBody {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 8px;
+  padding: 10px;
+  background: #fbfdff;
 }
 
-.checkCard {
-  display: grid;
-  grid-template-columns: 22px 1fr;
-  gap: 12px;
-  align-items: flex-start;
-  border: 1px solid var(--borde);
-  border-radius: 16px;
-  padding: 14px;
-  background: #fff;
-}
-
-.checkCard input {
-  margin-top: 4px;
-}
-
-.checkCard p {
-  margin: 4px 0 0 0;
-  color: #3e5166;
-  line-height: 1.5;
-}
-
-.textoAuxiliar {
-  color: var(--texto-suave);
-  line-height: 1.5;
-}
-
-.listaArchivos,
-.listaHallazgos {
-  margin: 8px 0 0 0;
-  padding-left: 18px;
-}
-
-.listaArchivos li,
-.listaHallazgos li {
-  margin-bottom: 8px;
-}
-
-.firmaBox {
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 16px;
-  border: 1px solid #d6e0ea;
-  background: #f8fbfe;
-}
-
-.firmaBox img {
-  max-width: 100%;
-  width: 420px;
-  height: auto;
-  display: block;
-}
-
-.accionesInicio,
-.barraAcciones,
-.accionesGrid {
+.hallazgoCheck {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 22px;
-}
-
-.btn {
-  border: none;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
   border-radius: 14px;
-  padding: 14px 18px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 160px;
-}
-
-.btnPrimario {
-  background: var(--azul-principal);
-  color: #fff;
-}
-
-.btnPrimario:hover {
-  background: var(--azul-secundario);
-}
-
-.btnSecundario {
-  background: var(--azul-suave);
-  color: #103357;
-}
-
-.btnSecundario:hover {
-  background: #dbe8f7;
-}
-
-.btnGhost {
+  border: 1px solid var(--line);
   background: #fff;
-  color: var(--azul-principal);
-  border: 1px solid #cfd9e3;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 }
 
-.btnGhost:hover {
-  background: #f3f7fb;
+.hallazgoCheck:hover {
+  border-color: #bfd6ea;
+  background: #f8fbff;
 }
 
-.errorBox {
-  color: #b42318;
-  font-weight: 700;
+.hallazgoCheck input {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--cyan);
 }
 
-@media (max-width: 1024px) {
-  .container {
-    max-width: 960px;
-  }
-
-  .page {
-    padding: 16px;
-  }
+.hallazgoCheck span {
+  color: var(--text);
+  line-height: 1.45;
 }
 
-@media (max-width: 768px) {
-  .heroContent,
-  .formGrid,
-  .infoGrid,
-  .checkGrid {
-    grid-template-columns: 1fr;
-  }
+.hallazgoCheck strong {
+  color: var(--navy-deep);
+}
 
-  .formTopBar,
-  .formBrand {
+.compactFormPanelResponsive {
+  display: grid;
+  gap: 4px;
+}
+
+.barraAccionesResponsive {
+  margin-top: 10px;
+}
+
+.miniActionSecondary {
+  background: #edf4fb;
+  color: var(--navy);
+  box-shadow: none;
+}
+
+@media (max-width: 760px) {
+  .sectionHeaderSplit {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .tituloPrincipal {
-    font-size: 30px;
+  .sectionMiniHelp {
+    max-width: none;
   }
 
-  .subtituloPrincipal {
-    font-size: 16px;
+  .hallazgoCategoriaHeader {
+    padding: 0.8rem 0.9rem;
   }
 
-  .panel {
-    padding: 18px;
-    border-radius: 18px;
-  }
-
-  .bloqueFormulario {
-    padding: 16px;
-  }
-
-  .accionesInicio,
-  .barraAcciones,
-  .accionesGrid {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
+  .hallazgoCheck {
+    padding: 9px 10px;
   }
 }
 
-@media (max-width: 480px) {
-  .page {
-    padding: 12px;
-  }
 
-  .heroPanel {
-    padding: 18px;
-  }
-
-  .tituloPrincipal {
-    font-size: 26px;
-  }
-
-  .logoEmpresa {
-    width: 110px;
-  }
-
-  .logoMini {
-    width: 58px;
-  }
-
-  .campo input,
-  .campo textarea,
-  .campo select {
-    font-size: 14px;
-    padding: 12px 14px;
-  }
-}
-/* ===== BLOQUE NUEVO PARA CLIENTE / ACCIONES SECUENCIALES ===== */
-
-.miniActionButton {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid #c9d6e5;
-  background: #f4f8fc;
-  color: #0f2747;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
+/* Ajuste puntual · números de resumen en dashboards */
+.kpiCard {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  align-content: start;
+  gap: 6px;
 }
 
-.miniActionButton:hover {
-  background: #e8f0f8;
-  border-color: #a9bfd7;
-}
-
-.miniActionButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.miniActionPrimary {
-  background: #eaf3ff;
-  border-color: #a9c6eb;
-}
-
-.secuenciaInfoBox {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f7fbff;
-  border: 1px solid #d4e2f0;
-  color: #17365d;
-}
-
-.textoAuxiliar {
+.kpiLabel {
   display: block;
-  margin-top: 8px;
-  color: #5b6472;
-  font-size: 13px;
+  margin: 0;
 }
 
-select:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-
-.miniActionButton {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid #c9d6e5;
-  background: #f4f8fc;
-  color: #0f2747;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.miniActionButton:hover {
-  background: #e8f0f8;
-  border-color: #a9bfd7;
-}
-
-.miniActionButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.miniActionPrimary {
-  background: #eaf3ff;
-  border-color: #a9c6eb;
-}
-
-.secuenciaInfoBox {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f7fbff;
-  border: 1px solid #d4e2f0;
-  color: #17365d;
-}
-
-.textoAuxiliar {
+.kpiValue {
   display: block;
-  margin-top: 8px;
-  color: #5b6472;
-  font-size: 13px;
+  margin: 2px 0 0;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-family: Inter, system-ui, Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--navy-deep);
 }
 
-select:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.kpiCard p {
+  margin: 0;
 }
-
-.miniActionButton {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid #c9d6e5;
-  background: #f4f8fc;
-  color: #0f2747;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.miniActionButton:hover {
-  background: #e8f0f8;
-  border-color: #a9bfd7;
-}
-
-.miniActionButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.miniActionPrimary {
-  background: #eaf3ff;
-  border-color: #a9c6eb;
-}
-
-.secuenciaInfoBox {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f7fbff;
-  border: 1px solid #d4e2f0;
-  color: #17365d;
-}
-
-.textoAuxiliar {
-  display: block;
-  margin-top: 8px;
-  color: #5b6472;
-  font-size: 13px;
-}
-
-select:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.miniActionButton {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid #c9d6e5;
-  background: #f4f8fc;
-  color: #0f2747;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.miniActionButton:hover {
-  background: #e8f0f8;
-  border-color: #a9bfd7;
-}
-
-.miniActionButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.miniActionPrimary {
-  background: #eaf3ff;
-  border-color: #a9c6eb;
-}
-
-.secuenciaInfoBox {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: #f7fbff;
-  border: 1px solid #d4e2f0;
-  color: #17365d;
-}
-
-.textoAuxiliar {
-  display: block;
-  margin-top: 8px;
-  color: #5b6472;
-  font-size: 13px;
-}
-
-select:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-

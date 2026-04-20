@@ -1,0 +1,372 @@
+const API = 'http://localhost:3001/api'
+
+export type DashboardCliente = {
+  id: number
+  nombre: string
+}
+
+export type DashboardSolicitud = {
+  id: number
+  estado?: string | null
+  nombreSolicitante: string
+  telefono?: string | null
+  correo?: string | null
+  empresa?: string | null
+  tipoServicio?: string | null
+  descripcion?: string | null
+  fechaDeseada?: string | null
+  createdAt?: string
+  departamento?: { id?: number; nombre?: string } | null
+  ciudad?: { id?: number; nombre?: string } | null
+  asignadoA?: { id?: number; nombre?: string } | null
+}
+
+export type DashboardVisita = {
+  id: number
+  numeroVisita?: string | null
+  estado?: string | null
+  fechaVisita?: string
+  tipoVisita?: string | null
+  motivoVisita?: string | null
+  requiereCotizacion?: boolean
+  esVisitaLibre?: boolean
+  cliente?: { id?: number; nombre?: string } | null
+  tecnico?: { id?: number; nombre?: string; email?: string } | null
+  actividad?: {
+    id?: number
+    codigoActividad?: string | null
+    titulo?: string
+    categoriaActividad?: string
+    estado?: string
+  } | null
+  maquinas?: Array<{
+    id: number
+    maquina?: {
+      id?: number
+      codigoInterno?: string | null
+      marca?: string | null
+      modelo?: string | null
+      serie?: string | null
+      area?: string | null
+    } | null
+  }>
+  asignados?: Array<{
+    id: number
+    rolEnVisita?: string
+    usuario?: { id?: number; nombre?: string; email?: string } | null
+  }>
+  reportes?: Array<{
+    id: number
+    numeroReporte?: string | null
+    estado?: string | null
+    fechaReporte?: string
+  }>
+}
+
+export type DashboardReporte = {
+  id: number
+  numeroReporte: string
+  estado?: string | null
+  fechaReporte?: string
+  cliente?: { id?: number; nombre?: string } | null
+  tecnico?: { id?: number; nombre?: string; email?: string } | null
+  visita?: { id?: number; fechaVisita?: string; estado?: string | null } | null
+  maquina?: {
+    id?: number
+    codigoInterno?: string | null
+    marca?: string | null
+    modelo?: string | null
+    serie?: string | null
+    area?: string | null
+  } | null
+  procedimiento?: { id?: number; nombre?: string; codigo?: string | null } | null
+  cierre?: {
+    fechaCierre?: string | null
+    nombreRecibe?: string | null
+    motivoNoRecepcion?: string | null
+  } | null
+  acciones?: {
+    verPdf?: string | null
+    descargarPdf?: string | null
+    whatsappTexto?: string | null
+    correoAsunto?: string | null
+    correoCuerpo?: string | null
+  }
+}
+
+export type DashboardBaseData = {
+  clientes: DashboardCliente[]
+  solicitudes: DashboardSolicitud[]
+  visitas: DashboardVisita[]
+  reportes: DashboardReporte[]
+}
+
+export type DashboardMetric = {
+  label: string
+  value: string
+  hint: string
+}
+
+export type DashboardAdminData = DashboardBaseData & {
+  metrics: DashboardMetric[]
+  solicitudesRecientes: DashboardSolicitud[]
+  visitasRecientes: DashboardVisita[]
+  reportesRecientes: DashboardReporte[]
+}
+
+export type DashboardSupervisorData = DashboardBaseData & {
+  metrics: DashboardMetric[]
+  solicitudesPorGestionar: DashboardSolicitud[]
+  visitasPendientes: DashboardVisita[]
+  reportesSinCierre: DashboardReporte[]
+}
+
+export type DashboardTecnicoData = DashboardBaseData & {
+  metrics: DashboardMetric[]
+  misVisitas: DashboardVisita[]
+  misReportes: DashboardReporte[]
+}
+
+function ordenarDescPorFecha<T>(items: T[], selector: (item: T) => string | null | undefined) {
+  return [...items].sort((a, b) => {
+    const fa = new Date(selector(a) || 0).getTime()
+    const fb = new Date(selector(b) || 0).getTime()
+    return fb - fa
+  })
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, {
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  const raw = await res.text()
+  const json = raw ? JSON.parse(raw) : {}
+
+  if (!res.ok || !json?.ok) {
+    throw new Error(json?.mensaje || `Error HTTP ${res.status}`)
+  }
+
+  return (json.data ?? json) as T
+}
+
+async function fetchSafe<T>(url: string, fallback: T): Promise<T> {
+  try {
+    return await fetchJson<T>(url)
+  } catch (error) {
+    console.error(`Error cargando ${url}:`, error)
+    return fallback
+  }
+}
+
+function normalizarEstado(valor?: string | null) {
+  return String(valor || '').trim().toUpperCase()
+}
+
+function fechaEsHoy(valor?: string | null) {
+  if (!valor) return false
+
+  const fecha = new Date(valor)
+  if (Number.isNaN(fecha.getTime())) return false
+
+  const hoy = new Date()
+
+  return (
+    fecha.getFullYear() === hoy.getFullYear() &&
+    fecha.getMonth() === hoy.getMonth() &&
+    fecha.getDate() === hoy.getDate()
+  )
+}
+
+function visitaSigueActiva(visita: DashboardVisita) {
+  const estado = normalizarEstado(visita.estado)
+  return !['FINALIZADA', 'ATENDIDA', 'COMPLETADA', 'CERRADA'].includes(estado)
+}
+
+function solicitudRequiereGestion(solicitud: DashboardSolicitud) {
+  const estado = normalizarEstado(solicitud.estado)
+  return ['NUEVA', 'EN_REVISION', 'PENDIENTE', 'PROGRAMADA'].includes(estado)
+}
+
+function reporteSinCierre(reporte: DashboardReporte) {
+  return !reporte.cierre?.fechaCierre && !reporte.cierre?.nombreRecibe && !reporte.cierre?.motivoNoRecepcion
+}
+
+function visitaPerteneceATecnico(visita: DashboardVisita, tecnicoId: number) {
+  if (visita.tecnico?.id === tecnicoId) return true
+
+  return (visita.asignados || []).some((asignado) => asignado.usuario?.id === tecnicoId)
+}
+
+function reportePerteneceATecnico(reporte: DashboardReporte, tecnicoId: number) {
+  return reporte.tecnico?.id === tecnicoId
+}
+
+export async function obtenerDashboardBaseData(): Promise<DashboardBaseData> {
+  const [clientes, solicitudes, visitas, reportes] = await Promise.all([
+    fetchSafe<DashboardCliente[]>(`${API}/clientes`, []),
+    fetchSafe<DashboardSolicitud[]>(`${API}/solicitudes-publicas`, []),
+    fetchSafe<DashboardVisita[]>(`${API}/visitas`, []),
+    fetchSafe<DashboardReporte[]>(`${API}/reportes`, []),
+  ])
+
+  return { clientes, solicitudes, visitas, reportes }
+}
+
+export function construirDashboardAdmin(base: DashboardBaseData): DashboardAdminData {
+  const solicitudesRecientes = ordenarDescPorFecha(base.solicitudes, (item) => item.createdAt).slice(0, 5)
+  const visitasRecientes = ordenarDescPorFecha(base.visitas, (item) => item.fechaVisita).slice(0, 5)
+  const reportesRecientes = ordenarDescPorFecha(base.reportes, (item) => item.fechaReporte).slice(0, 5)
+
+  const metrics: DashboardMetric[] = [
+    {
+      label: 'Clientes activos',
+      value: String(base.clientes.length),
+      hint: 'Base maestra actual registrada en el sistema.',
+    },
+    {
+      label: 'Solicitudes por revisar',
+      value: String(base.solicitudes.filter(solicitudRequiereGestion).length),
+      hint: 'Entradas nuevas del portal público pendientes de gestión.',
+    },
+    {
+      label: 'Visitas abiertas',
+      value: String(base.visitas.filter(visitaSigueActiva).length),
+      hint: 'Visitas todavía no finalizadas o no atendidas por completo.',
+    },
+    {
+      label: 'Reportes emitidos',
+      value: String(base.reportes.length),
+      hint: 'Cantidad total visible en la base actual.',
+    },
+  ]
+
+  return {
+    ...base,
+    metrics,
+    solicitudesRecientes,
+    visitasRecientes,
+    reportesRecientes,
+  }
+}
+
+export function construirDashboardSupervisor(base: DashboardBaseData): DashboardSupervisorData {
+  const solicitudesPorGestionar = ordenarDescPorFecha(
+    base.solicitudes.filter(solicitudRequiereGestion),
+    (item) => item.createdAt
+  ).slice(0, 6)
+
+  const visitasPendientes = ordenarDescPorFecha(
+    base.visitas.filter(visitaSigueActiva),
+    (item) => item.fechaVisita
+  ).slice(0, 6)
+
+  const reportesSinCierre = ordenarDescPorFecha(
+    base.reportes.filter(reporteSinCierre),
+    (item) => item.fechaReporte
+  ).slice(0, 6)
+
+  const metrics: DashboardMetric[] = [
+    {
+      label: 'Solicitudes nuevas / revisión',
+      value: String(base.solicitudes.filter(solicitudRequiereGestion).length),
+      hint: 'Bandeja inmediata para coordinación y asignación.',
+    },
+    {
+      label: 'Visitas de hoy',
+      value: String(base.visitas.filter((item) => fechaEsHoy(item.fechaVisita)).length),
+      hint: 'Trabajo programado o ejecutado en la fecha actual.',
+    },
+    {
+      label: 'Visitas pendientes',
+      value: String(base.visitas.filter(visitaSigueActiva).length),
+      hint: 'Casos todavía activos en operación.',
+    },
+    {
+      label: 'Reportes sin cierre',
+      value: String(base.reportes.filter(reporteSinCierre).length),
+      hint: 'Documentos que aún ocupan revisión o cierre operativo.',
+    },
+  ]
+
+  return {
+    ...base,
+    metrics,
+    solicitudesPorGestionar,
+    visitasPendientes,
+    reportesSinCierre,
+  }
+}
+
+export function construirDashboardTecnico(
+  base: DashboardBaseData,
+  tecnicoId: number
+): DashboardTecnicoData {
+  const misVisitas = ordenarDescPorFecha(
+    base.visitas.filter((visita) => visitaPerteneceATecnico(visita, tecnicoId)),
+    (item) => item.fechaVisita
+  ).slice(0, 6)
+
+  const misReportes = ordenarDescPorFecha(
+    base.reportes.filter((reporte) => reportePerteneceATecnico(reporte, tecnicoId)),
+    (item) => item.fechaReporte
+  ).slice(0, 6)
+
+  const metrics: DashboardMetric[] = [
+    {
+      label: 'Mis visitas activas',
+      value: String(misVisitas.filter(visitaSigueActiva).length),
+      hint: 'Visitas asignadas o bajo tu responsabilidad.',
+    },
+    {
+      label: 'Visitas de hoy',
+      value: String(misVisitas.filter((item) => fechaEsHoy(item.fechaVisita)).length),
+      hint: 'Trabajo previsto o realizado hoy.',
+    },
+    {
+      label: 'Mis reportes',
+      value: String(base.reportes.filter((reporte) => reportePerteneceATecnico(reporte, tecnicoId)).length),
+      hint: 'Reportes generados por tu usuario actual.',
+    },
+    {
+      label: 'Reportes con cierre',
+      value: String(
+        base.reportes.filter(
+          (reporte) =>
+            reportePerteneceATecnico(reporte, tecnicoId) && !reporteSinCierre(reporte)
+        ).length
+      ),
+      hint: 'Reportes que ya tienen recibido o motivo de no recepción.',
+    },
+  ]
+
+  return {
+    ...base,
+    metrics,
+    misVisitas,
+    misReportes,
+  }
+}
+
+export function textoSolicitudUbicacion(solicitud: DashboardSolicitud) {
+  const ciudad = solicitud.ciudad?.nombre || ''
+  const departamento = solicitud.departamento?.nombre || ''
+  return [ciudad, departamento].filter(Boolean).join(', ')
+}
+
+export function textoMaquinaVisita(visita: DashboardVisita) {
+  const primera = visita.maquinas?.[0]?.maquina
+  if (!primera) return 'Sin máquina asociada todavía'
+
+  const partes = [primera.codigoInterno, primera.marca, primera.modelo, primera.serie]
+    .filter((item) => item && String(item).trim())
+    .map((item) => String(item))
+
+  return partes.length ? partes.join(' · ') : `Máquina #${primera.id || ''}`
+}
+
+export function textoVisitaPrincipal(visita: DashboardVisita) {
+  return visita.numeroVisita || `Visita #${visita.id}`
+}

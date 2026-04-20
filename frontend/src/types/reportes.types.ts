@@ -3,11 +3,14 @@ export type VistaActual = 'inicio' | 'crear' | 'detalle' | 'cliente' | 'maquina'
 export type TecnicoOption = {
   id: number
   nombre: string
+  email?: string | null
 }
 
 export type ProcedimientoOption = {
   id: number
+  codigo?: string | null
   nombre: string
+  descripcionCompletaPdf?: string | null
 }
 
 export type HallazgoOption = {
@@ -24,6 +27,7 @@ export type Hallazgo = {
   hallazgoCatalogo?: {
     codigo?: string | null
     descripcion?: string | null
+    categoria?: string | null
   } | null
 }
 
@@ -37,6 +41,7 @@ export type DetalleMaquina = {
   psi?: string | null
   amperaje?: string | null
   observaciones?: string | null
+  hallazgosTexto?: string | null
   hallazgos?: Hallazgo[]
 }
 
@@ -45,18 +50,22 @@ export type ReporteResponse = {
   data: {
     id: number
     numeroReporte: string
+    estado?: string | null
     fechaReporte?: string
     conclusiones?: string | null
     observaciones?: string | null
     urlPdfLocal?: string | null
     cliente?: {
+      id?: number
       nombre?: string
     }
     tecnico?: {
+      id?: number
       nombre?: string
       email?: string
     }
     maquina?: {
+      id?: number
       codigoInterno?: string
       marca?: string
       modelo?: string
@@ -70,6 +79,7 @@ export type ReporteResponse = {
       }
     }
     tipoUnidad?: {
+      id?: number
       nombre?: string
       descripcion?: string
     }
@@ -92,7 +102,22 @@ export type ReporteResponse = {
   }
 }
 
+export type ReporteDetalle = ReporteResponse['data']
+
+export type CierreReporteFormState = {
+  tipoCierre: '' | 'RECIBIDO_EN_SITIO' | 'SIN_RECEPCION'
+  nombreRecibe: string
+  cargoRecibe: string
+  observacionesRecepcion: string
+  motivoSinRecepcion: string
+  observacionSinRecepcion: string
+  firmaBase64: string
+  firmaNombreArchivo: string
+  firmaMimeType: string
+}
+
 export type FormReporte = {
+  visitaId: string
   clienteId: string
   maquinaId: string
   tecnicoId: string
@@ -101,9 +126,24 @@ export type FormReporte = {
   amperaje: string
   conclusiones: string
   observaciones: string
+  hallazgosSeleccionados: number[]
+  anexos: File[]
+}
+
+export const CIERRE_REPORTE_INICIAL: CierreReporteFormState = {
+  tipoCierre: '',
+  nombreRecibe: '',
+  cargoRecibe: '',
+  observacionesRecepcion: '',
+  motivoSinRecepcion: '',
+  observacionSinRecepcion: '',
+  firmaBase64: '',
+  firmaNombreArchivo: 'firma_cliente.png',
+  firmaMimeType: 'image/png',
 }
 
 export const FORM_REPORTE_INICIAL: FormReporte = {
+  visitaId: '',
   clienteId: '',
   maquinaId: '',
   tecnicoId: '',
@@ -112,23 +152,6 @@ export const FORM_REPORTE_INICIAL: FormReporte = {
   amperaje: '',
   conclusiones: '',
   observaciones: '',
+  hallazgosSeleccionados: [],
+  anexos: [],
 }
-
-export const TECNICOS_DEMO: TecnicoOption[] = [
-  { id: 2, nombre: 'Tecnico Prueba ER' },
-  { id: 3, nombre: 'Tecnico Supervisor ER' },
-]
-
-export const PROCEDIMIENTOS_DEMO: ProcedimientoOption[] = [
-  { id: 1, nombre: 'Mantenimiento preventivo general' },
-  { id: 2, nombre: 'Diagnóstico de falla eléctrica' },
-  { id: 3, nombre: 'Revisión de presiones y amperaje' },
-]
-
-export const HALLAZGOS_DEMO: HallazgoOption[] = [
-  { id: 1, codigo: 'H-01', descripcion: 'Fuga detectada en línea de succión', categoria: 'Refrigeración' },
-  { id: 2, codigo: 'H-02', descripcion: 'Capacitor fuera de rango', categoria: 'Eléctrico' },
-  { id: 3, codigo: 'H-03', descripcion: 'Serpentín con suciedad acumulada', categoria: 'Mecánico' },
-  { id: 4, codigo: 'H-04', descripcion: 'Terminal floja en contactor', categoria: 'Eléctrico' },
-  { id: 5, codigo: 'H-05', descripcion: 'Presión baja respecto al rango normal', categoria: 'Refrigeración' },
-]

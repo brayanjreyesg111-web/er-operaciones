@@ -30,9 +30,15 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  role     Role      @relation(fields: [roleId], references: [id])
-  visitas  Visita[]
-  reportes Reporte[]
+  role                 Role                @relation(fields: [roleId], references: [id])
+  visitas              Visita[]            @relation("VisitaTecnicoPrincipal")
+  visitasAsignadas     VisitaAsignado[]
+  reportes             Reporte[]
+  solicitudesAsignadas SolicitudServicio[] @relation("SolicitudAsignada")
+  actividadesCreadas   Actividad[]         @relation("ActividadCreadaPor")
+  actividadesAsignadas ActividadAsignado[]
+  pasosRealizados      ActividadPaso[]     @relation("PasoRealizadoPor")
+  mensajesActividad    ActividadMensaje[]
 
   @@map("usuarios")
 }
@@ -46,14 +52,20 @@ model Cliente {
   correo         String?
   direccion      String?
   ubicacion      String?
+  departamentoId Int?
+  ciudadId       Int?
   activo         Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  departamento    Departamento?       @relation(fields: [departamentoId], references: [id])
+  ciudad          Ciudad?             @relation(fields: [ciudadId], references: [id])
   maquinas        Maquina[]
   ordenesServicio OrdenServicio[]
   visitas         Visita[]
   reportes        Reporte[]
+  actividades     Actividad[]
+  solicitudes     SolicitudServicio[]
 
   @@map("clientes")
 }
@@ -140,8 +152,10 @@ model Departamento {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ciudades Ciudad[]
-  maquinas Maquina[]
+  ciudades    Ciudad[]
+  maquinas    Maquina[]
+  clientes    Cliente[]
+  solicitudes SolicitudServicio[]
 
   @@map("departamentos")
 }
@@ -155,8 +169,10 @@ model Ciudad {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  departamento Departamento @relation(fields: [departamentoId], references: [id])
+  departamento Departamento        @relation(fields: [departamentoId], references: [id])
   maquinas     Maquina[]
+  clientes     Cliente[]
+  solicitudes  SolicitudServicio[]
 
   @@unique([departamentoId, nombre])
   @@map("ciudades")
@@ -224,6 +240,7 @@ model Maquina {
   visitas          VisitaMaquina[]
   reportesDetalle  ReporteDetalleMaquina[]
   reportesCabecera Reporte[]               @relation("ReporteMaquinaCabecera")
+  actividades      ActividadMaquina[]
 
   @@map("maquinas")
 }
@@ -245,21 +262,165 @@ model OrdenServicio {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  cliente Cliente  @relation(fields: [clienteId], references: [id])
-  visitas Visita[]
+  cliente     Cliente     @relation(fields: [clienteId], references: [id])
+  visitas     Visita[]
+  actividades Actividad[]
 
   @@map("ordenes_servicio")
 }
 
+model SolicitudServicio {
+  id                Int       @id @default(autoincrement())
+  clienteId         Int?
+  nombreSolicitante String
+  telefono          String
+  correo            String?
+  empresa           String?
+  departamentoId    Int
+  ciudadId          Int
+  direccionExacta   String?
+  tipoServicio      String?
+  descripcion       String
+  estado            String    @default("NUEVA")
+  motivoEstado      String?
+  canalOrigen       String    @default("PORTAL_WEB")
+  fechaDeseada      DateTime?
+  fechaGestion      DateTime?
+  asignadoAUserId   Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  cliente      Cliente?     @relation(fields: [clienteId], references: [id])
+  departamento Departamento @relation(fields: [departamentoId], references: [id])
+  ciudad       Ciudad       @relation(fields: [ciudadId], references: [id])
+  asignadoA    User?        @relation("SolicitudAsignada", fields: [asignadoAUserId], references: [id])
+  actividades  Actividad[]
+
+  @@map("solicitudes_servicio")
+}
+
+model Actividad {
+  id                 Int       @id @default(autoincrement())
+  codigoActividad    String    @unique
+  titulo             String
+  descripcion        String?
+  categoriaActividad String
+  tipoOrigen         String
+  clienteId          Int?
+  ordenServicioId    Int?
+  solicitudId        Int?
+  prioridad          String    @default("MEDIA")
+  estado             String    @default("PENDIENTE")
+  fechaProgramada    DateTime?
+  fechaInicio        DateTime?
+  fechaFin           DateTime?
+  progresoPorcentaje Int       @default(0)
+  requiereReporte    Boolean   @default(false)
+  requiereVisita     Boolean   @default(false)
+  creadoPorId        Int
+  observaciones      String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  cliente       Cliente?           @relation(fields: [clienteId], references: [id])
+  ordenServicio OrdenServicio?     @relation(fields: [ordenServicioId], references: [id])
+  solicitud     SolicitudServicio? @relation(fields: [solicitudId], references: [id])
+  creadoPor     User               @relation("ActividadCreadaPor", fields: [creadoPorId], references: [id])
+
+  visitas   Visita[]
+  asignados ActividadAsignado[]
+  maquinas  ActividadMaquina[]
+  pasos     ActividadPaso[]
+  mensajes  ActividadMensaje[]
+
+  @@map("actividades")
+}
+
+model ActividadAsignado {
+  id               Int      @id @default(autoincrement())
+  actividadId      Int
+  usuarioId        Int
+  rolEnActividad   String   @default("RESPONSABLE")
+  estadoAsignacion String   @default("ASIGNADA")
+  createdAt        DateTime @default(now())
+
+  actividad Actividad @relation(fields: [actividadId], references: [id])
+  usuario   User      @relation(fields: [usuarioId], references: [id])
+
+  @@unique([actividadId, usuarioId])
+  @@map("actividades_asignados")
+}
+
+model ActividadMaquina {
+  id             Int      @id @default(autoincrement())
+  actividadId    Int
+  maquinaId      Int
+  tipoTrabajo    String?
+  estadoAtencion String   @default("PENDIENTE")
+  observaciones  String?
+  porcentaje     Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  actividad Actividad @relation(fields: [actividadId], references: [id])
+  maquina   Maquina   @relation(fields: [maquinaId], references: [id])
+
+  @@unique([actividadId, maquinaId])
+  @@map("actividades_maquinas")
+}
+
+model ActividadPaso {
+  id               Int       @id @default(autoincrement())
+  actividadId      Int
+  orden            Int
+  tituloPaso       String
+  descripcionPaso  String?
+  obligatorio      Boolean   @default(true)
+  estadoPaso       String    @default("PENDIENTE")
+  porcentajePaso   Int       @default(0)
+  realizadoPorId   Int?
+  fechaRealizacion DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  actividad    Actividad @relation(fields: [actividadId], references: [id])
+  realizadoPor User?     @relation("PasoRealizadoPor", fields: [realizadoPorId], references: [id])
+
+  @@map("actividad_pasos")
+}
+
+model ActividadMensaje {
+  id               Int      @id @default(autoincrement())
+  actividadId      Int?
+  visitaId         Int?
+  usuarioId        Int
+  tipoMensaje      String
+  asunto           String?
+  mensaje          String
+  prioridad        String   @default("MEDIA")
+  estado           String   @default("NUEVO")
+  creadoParaUserId Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  actividad Actividad? @relation(fields: [actividadId], references: [id])
+  visita    Visita?    @relation(fields: [visitaId], references: [id])
+  usuario   User       @relation(fields: [usuarioId], references: [id])
+
+  @@map("actividad_mensajes")
+}
+
 model Visita {
   id                 Int       @id @default(autoincrement())
+  numeroVisita       String?   @unique
   ordenServicioId    Int?
   clienteId          Int
   tecnicoId          Int
+  actividadId        Int?
   tipoVisita         String?
   motivoVisita       String?
   resultadoBreve     String?
-  estado             String    @default("pendiente")
+  estado             String    @default("PENDIENTE")
+  motivoEstado       String?
   requiereCotizacion Boolean   @default(false)
   esVisitaLibre      Boolean   @default(false)
   fechaVisita        DateTime  @default(now())
@@ -269,13 +430,31 @@ model Visita {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  ordenServicio OrdenServicio?  @relation(fields: [ordenServicioId], references: [id])
-  cliente       Cliente         @relation(fields: [clienteId], references: [id])
-  tecnico       User            @relation(fields: [tecnicoId], references: [id])
+  ordenServicio OrdenServicio?     @relation(fields: [ordenServicioId], references: [id])
+  cliente       Cliente            @relation(fields: [clienteId], references: [id])
+  tecnico       User               @relation("VisitaTecnicoPrincipal", fields: [tecnicoId], references: [id])
+  actividad     Actividad?         @relation(fields: [actividadId], references: [id])
   maquinas      VisitaMaquina[]
   reportes      Reporte[]
+  asignados     VisitaAsignado[]
+  mensajes      ActividadMensaje[]
 
   @@map("visitas")
+}
+
+model VisitaAsignado {
+  id               Int      @id @default(autoincrement())
+  visitaId         Int
+  usuarioId        Int
+  rolEnVisita      String   @default("RESPONSABLE")
+  estadoAsignacion String   @default("ASIGNADA")
+  createdAt        DateTime @default(now())
+
+  visita  Visita @relation(fields: [visitaId], references: [id])
+  usuario User   @relation(fields: [usuarioId], references: [id])
+
+  @@unique([visitaId, usuarioId])
+  @@map("visitas_asignados")
 }
 
 model VisitaMaquina {

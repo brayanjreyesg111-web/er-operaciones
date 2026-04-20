@@ -7,27 +7,21 @@ type CrearClienteInput = {
   telefono?: string;
   correo?: string;
   direccion?: string;
-  ubicacion?: string;
-  activo?: boolean;
+  departamentoId: number;
+  ciudadId: number;
 };
 
 export async function listarClientes() {
   const clientes = await prisma.cliente.findMany({
+    where: {
+      activo: true,
+    },
     orderBy: {
       id: "desc",
     },
     select: {
       id: true,
       nombre: true,
-      rtn: true,
-      contactoNombre: true,
-      telefono: true,
-      correo: true,
-      direccion: true,
-      ubicacion: true,
-      activo: true,
-      createdAt: true,
-      updatedAt: true,
     },
   });
 
@@ -45,10 +39,23 @@ export async function obtenerClientePorId(id: number) {
       telefono: true,
       correo: true,
       direccion: true,
-      ubicacion: true,
+      departamentoId: true,
+      ciudadId: true,
       activo: true,
       createdAt: true,
       updatedAt: true,
+      departamento: {
+        select: {
+          id: true,
+          nombre: true,
+        },
+      },
+      ciudad: {
+        select: {
+          id: true,
+          nombre: true,
+        },
+      },
       maquinas: {
         where: {
           activo: true,
@@ -71,6 +78,23 @@ export async function obtenerClientePorId(id: number) {
 }
 
 export async function crearCliente(data: CrearClienteInput) {
+  const ciudad = await prisma.ciudad.findUnique({
+    where: { id: data.ciudadId },
+    select: {
+      id: true,
+      nombre: true,
+      departamentoId: true,
+    },
+  });
+
+  if (!ciudad) {
+    throw new Error("La ciudad seleccionada no existe.");
+  }
+
+  if (ciudad.departamentoId !== data.departamentoId) {
+    throw new Error("La ciudad no pertenece al departamento seleccionado.");
+  }
+
   const cliente = await prisma.cliente.create({
     data: {
       nombre: data.nombre.trim(),
@@ -79,8 +103,9 @@ export async function crearCliente(data: CrearClienteInput) {
       telefono: data.telefono?.trim() || null,
       correo: data.correo?.trim() || null,
       direccion: data.direccion?.trim() || null,
-      ubicacion: data.ubicacion?.trim() || null,
-      activo: data.activo ?? true,
+      departamentoId: data.departamentoId,
+      ciudadId: data.ciudadId,
+      activo: true,
     },
     select: {
       id: true,
@@ -90,7 +115,8 @@ export async function crearCliente(data: CrearClienteInput) {
       telefono: true,
       correo: true,
       direccion: true,
-      ubicacion: true,
+      departamentoId: true,
+      ciudadId: true,
       activo: true,
       createdAt: true,
       updatedAt: true,
@@ -99,4 +125,3 @@ export async function crearCliente(data: CrearClienteInput) {
 
   return cliente;
 }
-

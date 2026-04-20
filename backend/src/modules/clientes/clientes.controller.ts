@@ -71,8 +71,8 @@ export async function crearClienteController(req: Request, res: Response) {
       telefono,
       correo,
       direccion,
-      ubicacion,
-      activo,
+      departamentoId,
+      ciudadId,
     } = req.body ?? {};
 
     if (!nombre || !String(nombre).trim()) {
@@ -82,15 +82,29 @@ export async function crearClienteController(req: Request, res: Response) {
       });
     }
 
+    if (!departamentoId || Number(departamentoId) <= 0) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: "El departamento es obligatorio.",
+      });
+    }
+
+    if (!ciudadId || Number(ciudadId) <= 0) {
+      return res.status(400).json({
+        ok: false,
+        mensaje: "La ciudad es obligatoria.",
+      });
+    }
+
     const data = await crearCliente({
       nombre: String(nombre),
-      rtn,
-      contactoNombre,
-      telefono,
-      correo,
-      direccion,
-      ubicacion,
-      activo,
+      rtn: rtn ? String(rtn) : undefined,
+      contactoNombre: contactoNombre ? String(contactoNombre) : undefined,
+      telefono: telefono ? String(telefono) : undefined,
+      correo: correo ? String(correo) : undefined,
+      direccion: direccion ? String(direccion) : undefined,
+      departamentoId: Number(departamentoId),
+      ciudadId: Number(ciudadId),
     });
 
     return res.status(201).json({

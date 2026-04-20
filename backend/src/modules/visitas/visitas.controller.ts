@@ -7,17 +7,13 @@ import { Request, Response } from "express";
 import {
   asociarMaquinasAVisitaService,
   crearVisitaService,
+  finalizarVisitaService,
   listarVisitasService,
   obtenerVisitaPorIdService,
 } from "./visitas.service";
 
-/*************************************************
- * SECCIÓN 1. HELPER DE ESTADO HTTP
- *************************************************/
-
 function resolverStatus(error: unknown): number {
-  const mensaje =
-    error instanceof Error ? error.message.toLowerCase() : "error desconocido";
+  const mensaje = error instanceof Error ? error.message.toLowerCase() : "error desconocido";
 
   if (
     mensaje.includes("obligatorio") ||
@@ -33,13 +29,6 @@ function resolverStatus(error: unknown): number {
   return 500;
 }
 
-/*************************************************
- * SECCIÓN 2. CREAR VISITA
- * Soporta:
- * - visita desde orden
- * - visita libre
- *************************************************/
-
 export async function crearVisita(req: Request, res: Response) {
   try {
     const visitaCreada = await crearVisitaService(req.body);
@@ -51,24 +40,16 @@ export async function crearVisita(req: Request, res: Response) {
     });
   } catch (error) {
     const status = resolverStatus(error);
-
     return res.status(status).json({
       ok: false,
-      mensaje:
-        error instanceof Error ? error.message : "Error al crear la visita.",
+      mensaje: error instanceof Error ? error.message : "Error al crear la visita.",
     });
   }
 }
 
-/*************************************************
- * SECCIÓN 3. LISTAR VISITAS
- *************************************************/
-
 export async function listarVisitas(req: Request, res: Response) {
   try {
-    const visitas = await listarVisitasService(
-      req.query as Record<string, unknown>
-    );
+    const visitas = await listarVisitasService(req.query as Record<string, unknown>);
 
     return res.status(200).json({
       ok: true,
@@ -77,23 +58,16 @@ export async function listarVisitas(req: Request, res: Response) {
     });
   } catch (error) {
     const status = resolverStatus(error);
-
     return res.status(status).json({
       ok: false,
-      mensaje:
-        error instanceof Error ? error.message : "Error al listar visitas.",
+      mensaje: error instanceof Error ? error.message : "Error al listar visitas.",
     });
   }
 }
 
-/*************************************************
- * SECCIÓN 4. OBTENER VISITA POR ID
- *************************************************/
-
 export async function obtenerVisitaPorId(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
-
     const visita = await obtenerVisitaPorIdService(id);
 
     return res.status(200).json({
@@ -103,40 +77,19 @@ export async function obtenerVisitaPorId(req: Request, res: Response) {
     });
   } catch (error) {
     const status = resolverStatus(error);
-
     return res.status(status).json({
       ok: false,
-      mensaje:
-        error instanceof Error
-          ? error.message
-          : "Error al obtener la visita.",
+      mensaje: error instanceof Error ? error.message : "Error al obtener la visita.",
     });
   }
 }
 
-/*************************************************
- * SECCIÓN 5. ASOCIAR MÁQUINAS A UNA VISITA
- * Body esperado:
- * {
- *   "maquinas": [
- *     { "maquinaId": 1 },
- *     { "maquinaId": 2 }
- *   ]
- * }
- *************************************************/
-
-export async function asociarMaquinasAVisitaHandler(
-  req: Request,
-  res: Response
-) {
+export async function asociarMaquinasAVisitaHandler(req: Request, res: Response) {
   try {
     const visitaId = Number(req.params.id);
     const maquinas = Array.isArray(req.body?.maquinas) ? req.body.maquinas : [];
 
-    const visitaActualizada = await asociarMaquinasAVisitaService(
-      visitaId,
-      maquinas
-    );
+    const visitaActualizada = await asociarMaquinasAVisitaService(visitaId, maquinas);
 
     return res.status(200).json({
       ok: true,
@@ -145,13 +98,28 @@ export async function asociarMaquinasAVisitaHandler(
     });
   } catch (error) {
     const status = resolverStatus(error);
-
     return res.status(status).json({
       ok: false,
-      mensaje:
-        error instanceof Error
-          ? error.message
-          : "Error al asociar máquinas a la visita.",
+      mensaje: error instanceof Error ? error.message : "Error al asociar máquinas a la visita.",
+    });
+  }
+}
+
+export async function finalizarVisita(req: Request, res: Response) {
+  try {
+    const visitaId = Number(req.params.id);
+    const visita = await finalizarVisitaService(visitaId, req.body || {});
+
+    return res.status(200).json({
+      ok: true,
+      mensaje: "Visita finalizada correctamente.",
+      data: visita,
+    });
+  } catch (error) {
+    const status = resolverStatus(error);
+    return res.status(status).json({
+      ok: false,
+      mensaje: error instanceof Error ? error.message : "Error al finalizar la visita.",
     });
   }
 }

@@ -5,10 +5,6 @@ import routes from "./routes";
 
 const app = express();
 
-/**
- * SECCIÓN 8.0
- * CORS para permitir frontend local con Vite.
- */
 app.use(
   cors({
     origin: ["http://localhost:5173"],
@@ -17,36 +13,31 @@ app.use(
   })
 );
 
-/**
- * SECCIÓN 8.1
- * Middleware para leer JSON.
- */
-app.use(express.json());
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-/**
- * SECCIÓN 8.1-A
- * Publicar carpeta storage para acceso local por URL.
- */
-app.use(
-  "/storage",
-  express.static(path.resolve(process.cwd(), "storage"))
-);
+app.use("/storage", express.static(path.resolve(process.cwd(), "storage")));
 
-/**
- * SECCIÓN 8.2
- * Ruta health opcional para revisar que el servidor está vivo.
- */
 app.get("/api/health", (_req, res) => {
+  res.json({ ok: true, mensaje: "Servidor funcionando correctamente." });
+});
+
+app.get("/api", (_req, res) => {
   res.json({
     ok: true,
-    mensaje: "Servidor funcionando correctamente.",
+    mensaje: "API ER Operaciones activa.",
+    modulos: [
+      "ordenes-servicio",
+      "visitas",
+      "reportes",
+      "clientes",
+      "maquinas",
+      "catalogos",
+      "solicitudes-publicas",
+    ],
   });
 });
 
-/**
- * SECCIÓN 8.3
- * Integración del router principal.
- */
 app.use("/api", routes);
 
 export default app;

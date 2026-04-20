@@ -1,3 +1,4 @@
+// backend/src/lib/storage/reportes-pdf.ts
 import fs from "node:fs";
 import path from "node:path";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
@@ -51,6 +52,11 @@ function textoPlano(valor: any): string {
   return String(valor);
 }
 
+function limpiarTexto(valor: any): string {
+  if (valor === null || valor === undefined) return "";
+  return String(valor).replace(/\r/g, "").trim();
+}
+
 function partirTextoEnLineas(
   texto: string,
   { font, size, maxWidth }: TextoOptions
@@ -78,6 +84,27 @@ function partirTextoEnLineas(
   return lineas.length ? lineas : [""];
 }
 
+function partirTextoPreservandoSaltos(
+  texto: string,
+  options: TextoOptions
+): string[] {
+  const textoLimpio = (texto || "").replace(/\r/g, "");
+  const bloques = textoLimpio.split("\n");
+  const lineasFinales: string[] = [];
+
+  for (const bloque of bloques) {
+    if (!bloque.trim()) {
+      lineasFinales.push("");
+      continue;
+    }
+
+    const lineas = partirTextoEnLineas(bloque, options);
+    lineasFinales.push(...lineas);
+  }
+
+  return lineasFinales.length ? lineasFinales : [""];
+}
+
 function obtenerPrimerValor(...valores: any[]): string {
   for (const valor of valores) {
     if (valor !== null && valor !== undefined && String(valor).trim() !== "") {
@@ -87,71 +114,293 @@ function obtenerPrimerValor(...valores: any[]): string {
   return "N/D";
 }
 
+function normalizarTextoVisual(valor: string): string {
+  return valor
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^A-Za-z0-9_/-]/g, "");
+}
+
+function abreviarTipoUnidadVisual(tipo?: string | null): string {
+  const valor = limpiarTexto(tipo).toUpperCase();
+
+  const mapa: Record<string, string> = {
+    MINI_SPLIT_9000: "MS9",
+    MINI_SPLIT_12000: "MS12",
+    MINI_SPLIT_18000: "MS18",
+    MINI_SPLIT_24000: "MS24",
+    MINI_SPLIT_36000: "MS36",
+    PISO_TECHO_36000: "PT36",
+    PISO_TECHO_60000: "PT60",
+    CHILLER: "CHIL",
+    CUARTO_FRIO: "CF",
+    CAMARA_FRIA: "CF",
+    EVAPORADOR: "EVAP",
+    CONDENSADOR: "COND",
+  };
+
+  if (mapa[valor]) return mapa[valor];
+
+  const partes = valor.split("_").filter(Boolean);
+  if (!partes.length) return "EQ";
+
+  if (partes.length === 1) {
+    return partes[0].slice(0, 4);
+  }
+
+  return partes
+    .map((parte) => parte[0])
+    .join("")
+    .slice(0, 5);
+}
+
+function construirNombreMaquina(reporte: any, detalles: any[]): string {
+  const maquina = reporte?.maquina ?? detalles?.[0]?.maquina ?? null;
+
+  const codigoInterno = limpiarTexto(maquina?.codigoInterno);
+  if (codigoInterno) return codigoInterno;
+
+  const nombreEquipo = limpiarTexto(maquina?.nombreEquipo);
+  if (nombreEquipo) return nombreEquipo;
+
+  const partes = [
+    limpiarTexto(maquina?.marca),
+    limpiarTexto(maquina?.modelo),
+    limpiarTexto(maquina?.serie) ? `Serie ${limpiarTexto(maquina?.serie)}` : "",
+    limpiarTexto(maquina?.area),
+  ].filter(Boolean);
+
+  return partes.length ? partes.join(" | ") : "N/D";
+}
+
+function construirNombreMaquinaVisual(reporte: any, detalles: any[]): string {
+  const maquina = reporte?.maquina ?? detalles?.[0]?.maquina ?? null;
+
+  const tipoUnidad = obtenerPrimerValor(
+    reporte?.tipoUnidad?.nombre,
+    detalles?.[0]?.tipoUnidad?.nombre,
+    detalles?.[0]?.maquina?.tipoUnidad?.nombre
+  );
+
+  const marca = limpiarTexto(
+    obtenerPrimerValor(maquina?.marca, maquina?.marcaCatalogo?.nombre)
+  );
+
+  const serie = limpiarTexto(maquina?.serie);
+  const area = limpiarTexto(maquina?.area);
+
+  const partes = [
+    abreviarTipoUnidadVisual(tipoUnidad),
+    normalizarTextoVisual(marca),
+    normalizarTextoVisual(serie),
+    normalizarTextoVisual(area),
+  ].filter(Boolean);
+
+  return partes.length
+    ? partes.join(" - ")
+    : construirNombreMaquina(reporte, detalles);
+}
+
+function separarDescripcionEnumerada(texto: string): string[] {
+  const limpio = limpiarTexto(texto);
+  if (!limpio) return [];
+
+  const normalizado = limpio.replace(/\s+/g, " ").trim();
+
+  if (!/\d+\./.test(normalizado)) {
+    return [normalizado];
+  }
+
+  const partes = normalizado
+    .split(/(?=\d+\.\s)/g)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return partes.length ? partes : [normalizado];
+}
+
+function separarTextoEnPasosVisuales(texto: string): string[] {
+  const limpio = limpiarTexto(texto);
+  if (!limpio) return [];
+
+  const porSaltos = limpio
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (porSaltos.length > 1) {
+    return porSaltos;
+  }
+
+  const enumerados = separarDescripcionEnumerada(limpio);
+  if (enumerados.length > 1) {
+    return enumerados;
+  }
+
+  const porFrases = limpio
+    .split(/(?<=[.:;])\s+(?=[A-ZÁÉÍÓÚÑ0-9])/g)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return porFrases.length ? porFrases : [limpio];
+}
+
 function construirTextoProcedimiento(detalles: any[]): string {
   if (!detalles.length) return "N/D";
 
   const bloques: string[] = [];
 
   detalles.forEach((detalle: any, index: number) => {
-    const partes: string[] = [];
+    const lineas: string[] = [];
 
-    if (detalle.tituloActividad) {
-      partes.push(`Actividad ${index + 1}: ${detalle.tituloActividad}`);
+    const tituloActividad = limpiarTexto(detalle.tituloActividad);
+    const descripcionActividadPdf = limpiarTexto(detalle.descripcionActividadPdf);
+    const diagnostico = limpiarTexto(detalle.diagnostico);
+    const trabajoRealizado = limpiarTexto(detalle.trabajoRealizado);
+    const recomendaciones = limpiarTexto(detalle.recomendaciones);
+
+    if (tituloActividad) {
+      lineas.push(`• Actividad: ${tituloActividad}`);
+    } else if (detalles.length > 1) {
+      lineas.push(`• Detalle ${index + 1}`);
     }
 
-    if (detalle.descripcionActividadPdf) {
-      partes.push(`Procedimiento: ${detalle.descripcionActividadPdf}`);
+    if (descripcionActividadPdf) {
+      lineas.push("• Procedimiento:");
+      const pasos = separarTextoEnPasosVisuales(descripcionActividadPdf);
+      pasos.forEach((paso) => {
+        lineas.push(`  - ${paso}`);
+      });
     }
 
-    if (detalle.diagnostico) {
-      partes.push(`Diagnóstico: ${detalle.diagnostico}`);
+    if (diagnostico) {
+      lineas.push(`• Diagnóstico: ${diagnostico}`);
     }
 
-    if (detalle.trabajoRealizado) {
-      partes.push(`Trabajo realizado: ${detalle.trabajoRealizado}`);
+    if (trabajoRealizado) {
+      lineas.push(`• Trabajo realizado: ${trabajoRealizado}`);
     }
 
-    if (detalle.recomendaciones) {
-      partes.push(`Recomendaciones: ${detalle.recomendaciones}`);
+    if (recomendaciones) {
+      lineas.push(`• Recomendaciones: ${recomendaciones}`);
     }
 
-    if (partes.length) {
-      bloques.push(partes.join("\n"));
+    if (lineas.length) {
+      bloques.push(lineas.join("\n"));
     }
   });
 
   return bloques.length ? bloques.join("\n\n") : "N/D";
 }
 
+function normalizarCategoria(categoria?: string | null): string {
+  const valor = limpiarTexto(categoria || "Condición general").toLowerCase();
+
+  const sinAcentos = valor
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const mapa: Record<string, string> = {
+    electrico: "Eléctrico",
+    general: "Condición general",
+    mecanico: "Mecánico",
+    operacion: "Operación",
+    refrigeracion: "Refrigeración",
+    "condicion general": "Condición general",
+  };
+
+  return mapa[sinAcentos] || "Condición general";
+}
+
 function construirTextoHallazgos(detalles: any[]): string {
   if (!detalles.length) return "No se registraron hallazgos.";
 
-  const items: string[] = [];
+  const grupos = new Map<string, string[]>();
 
-  detalles.forEach((detalle: any, detalleIndex: number) => {
-    if (detalle.hallazgosTexto && String(detalle.hallazgosTexto).trim()) {
-      items.push(
-        `Detalle ${detalleIndex + 1}: ${String(detalle.hallazgosTexto).trim()}`
-      );
+  detalles.forEach((detalle: any) => {
+    const tieneHallazgosRelacionados =
+      Array.isArray(detalle.hallazgos) && detalle.hallazgos.length > 0;
+
+    if (!tieneHallazgosRelacionados) {
+      const textoPlanoHallazgo = limpiarTexto(detalle.hallazgosTexto);
+      if (textoPlanoHallazgo) {
+        const categoria = "Condición general";
+        const items = grupos.get(categoria) || [];
+        items.push(`- ${textoPlanoHallazgo}`);
+        grupos.set(categoria, items);
+      }
     }
 
-    if (Array.isArray(detalle.hallazgos) && detalle.hallazgos.length) {
+    if (tieneHallazgosRelacionados) {
       detalle.hallazgos.forEach((hallazgo: any) => {
         const codigo = obtenerPrimerValor(
           hallazgo.codigoHallazgo,
           hallazgo.hallazgoCatalogo?.codigo
         );
+
         const descripcion = obtenerPrimerValor(
           hallazgo.descripcionHallazgo,
           hallazgo.hallazgoCatalogo?.descripcion
         );
 
-        items.push(`${codigo}: ${descripcion}`);
+        const categoria = normalizarCategoria(
+          hallazgo.hallazgoCatalogo?.categoria
+        );
+
+        const items = grupos.get(categoria) || [];
+        items.push(`- ${codigo}: ${descripcion}`);
+        grupos.set(categoria, items);
       });
     }
   });
 
-  return items.length ? items.join("\n") : "No se registraron hallazgos.";
+  if (!grupos.size) return "No se registraron hallazgos.";
+
+  const bloques: string[] = [];
+
+  for (const [categoria, items] of grupos.entries()) {
+    bloques.push(categoria);
+    bloques.push(...items);
+    bloques.push("");
+  }
+
+  return bloques.join("\n").trim() || "No se registraron hallazgos.";
+}
+
+function esRutaImagen(rutaArchivo?: string | null): boolean {
+  if (!rutaArchivo) return false;
+  const lower = rutaArchivo.toLowerCase();
+  return (
+    lower.endsWith(".png") ||
+    lower.endsWith(".jpg") ||
+    lower.endsWith(".jpeg") ||
+    lower.endsWith(".webp")
+  );
+}
+
+async function incrustarImagenDesdeRuta(params: {
+  pdfDoc: PDFDocument;
+  rutaArchivo: string;
+}) {
+  const { pdfDoc, rutaArchivo } = params;
+  const buffer = fs.readFileSync(rutaArchivo);
+  const lower = rutaArchivo.toLowerCase();
+
+  if (lower.endsWith(".png")) {
+    return pdfDoc.embedPng(buffer);
+  }
+
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) {
+    return pdfDoc.embedJpg(buffer);
+  }
+
+  if (lower.endsWith(".webp")) {
+    throw new Error(
+      "WEBP no soportado directamente por pdf-lib. Conviene convertirlo a JPG o PNG antes."
+    );
+  }
+
+  throw new Error("Formato de imagen no soportado.");
 }
 
 async function dibujarFirmaSiExiste(params: {
@@ -169,8 +418,8 @@ async function dibujarFirmaSiExiste(params: {
     rutaFirma,
     x,
     y,
-    maxWidth = 200,
-    maxHeight = 90,
+    maxWidth = 170,
+    maxHeight = 70,
   } = params;
 
   if (!rutaFirma) {
@@ -188,10 +437,7 @@ async function dibujarFirmaSiExiste(params: {
 
   if (rutaLower.endsWith(".png")) {
     imagen = await pdfDoc.embedPng(buffer);
-  } else if (
-    rutaLower.endsWith(".jpg") ||
-    rutaLower.endsWith(".jpeg")
-  ) {
+  } else if (rutaLower.endsWith(".jpg") || rutaLower.endsWith(".jpeg")) {
     imagen = await pdfDoc.embedJpg(buffer);
   } else {
     return { ok: false, heightUsed: 0, motivo: "formato_no_soportado" };
@@ -247,19 +493,31 @@ async function dibujarLogoEmpresa(params: {
     maxHeight = 42,
   } = params;
 
-  const rutaLogo = path.resolve(
-    process.cwd(),
-    "storage",
-    "assets",
-    "logo_er.png"
-  );
+  const rutasLogo = [
+    path.resolve(process.cwd(), "storage", "assets", "logo_er.png"),
+    path.resolve(process.cwd(), "storage", "assets", "logo_er.jpg"),
+    path.resolve(process.cwd(), "storage", "assets", "logo_er.jpeg"),
+  ];
 
-  if (!fs.existsSync(rutaLogo)) {
+  const rutaLogo = rutasLogo.find((ruta) => fs.existsSync(ruta));
+
+  if (!rutaLogo) {
     return { ok: false, widthUsed: 0, heightUsed: 0 };
   }
 
   const buffer = fs.readFileSync(rutaLogo);
-  const imagen = await pdfDoc.embedPng(buffer);
+  const rutaLower = rutaLogo.toLowerCase();
+
+  let imagen: any;
+
+  if (rutaLower.endsWith(".png")) {
+    imagen = await pdfDoc.embedPng(buffer);
+  } else if (rutaLower.endsWith(".jpg") || rutaLower.endsWith(".jpeg")) {
+    imagen = await pdfDoc.embedJpg(buffer);
+  } else {
+    return { ok: false, widthUsed: 0, heightUsed: 0 };
+  }
+
   const dimensiones = imagen.scale(1);
 
   const escala = Math.min(
@@ -310,14 +568,14 @@ export async function generarPdfReporteLocal(
 
   const tieneAnexos = Array.isArray(anexos) && anexos.length > 0;
 
-  const tieneCierre =
+  const mostrarRecepcionTrabajo =
     !!cierre &&
     (
+      !!cierre.urlFirma ||
       !!cierre.nombreRecibe ||
       !!cierre.puestoRecibe ||
       !!cierre.observaciones ||
       !!cierre.motivoNoRecepcion ||
-      !!cierre.urlFirma ||
       !!cierre.fechaCierre
     );
 
@@ -328,6 +586,15 @@ export async function generarPdfReporteLocal(
     reporte.maquina?.marcaCatalogo?.nombre,
     detalles[0]?.maquina?.marca,
     detalles[0]?.maquina?.marcaCatalogo?.nombre
+  );
+
+  const maquinaTexto = construirNombreMaquinaVisual(reporte, detalles);
+
+  const tipoUnidadTexto = obtenerPrimerValor(
+    reporte.typeUnidad?.nombre,
+    reporte.tipoUnidad?.nombre,
+    detalles[0]?.tipoUnidad?.nombre,
+    detalles[0]?.maquina?.tipoUnidad?.nombre
   );
 
   const psiSuccion = obtenerPrimerValor(detalles[0]?.psi, reporte.psi);
@@ -347,6 +614,12 @@ export async function generarPdfReporteLocal(
     }
   };
 
+  const ensureSectionSpace = (altoMinimo = 120) => {
+    if (y - altoMinimo < marginBottom) {
+      nuevaPagina();
+    }
+  };
+
   const drawWrappedText = (
     texto: string,
     x: number,
@@ -356,7 +629,7 @@ export async function generarPdfReporteLocal(
     maxWidth: number,
     lineGap = 3
   ) => {
-    const lineas = partirTextoEnLineas(texto, {
+    const lineas = partirTextoPreservandoSaltos(texto, {
       font,
       size,
       maxWidth,
@@ -365,6 +638,11 @@ export async function generarPdfReporteLocal(
     let cursorY = yBase;
 
     for (const linea of lineas) {
+      if (!linea) {
+        cursorY -= size + lineGap;
+        continue;
+      }
+
       page.drawText(linea, {
         x,
         y: cursorY,
@@ -382,8 +660,8 @@ export async function generarPdfReporteLocal(
     };
   };
 
-  const drawSectionTitle = (titulo: string) => {
-    ensureSpace(30);
+  const drawSectionTitle = (titulo: string, minSpaceAfter = 120) => {
+    ensureSectionSpace(minSpaceAfter);
 
     page.drawRectangle({
       x: marginX,
@@ -411,8 +689,19 @@ export async function generarPdfReporteLocal(
     rows: Array<{ label: string; value: string }>
   ) => {
     const titleHeight = 16;
-    const rowHeight = 18;
-    const totalHeight = titleHeight + rows.length * rowHeight + 12;
+    let totalRowsHeight = 0;
+
+    rows.forEach((row) => {
+      const wrapped = partirTextoPreservandoSaltos(row.value || "N/D", {
+        font: fontRegular,
+        size: 9.5,
+        maxWidth: contentWidth - 155,
+      });
+
+      totalRowsHeight += Math.max(18, wrapped.length * 11);
+    });
+
+    const totalHeight = titleHeight + totalRowsHeight + 12;
 
     ensureSpace(totalHeight + 8);
 
@@ -462,20 +751,20 @@ export async function generarPdfReporteLocal(
         2
       );
 
-      rowY -= Math.max(rowHeight, wrapped.lineas.length * 11);
+      rowY -= Math.max(18, wrapped.lineas.length * 11);
     });
 
     y = rowY - 4;
   };
 
   const drawTextAreaBox = (titulo: string, texto: string) => {
-    const lineas = partirTextoEnLineas(texto || "N/D", {
+    const lineas = partirTextoPreservandoSaltos(texto || "N/D", {
       font: fontRegular,
       size: 10,
       maxWidth: contentWidth - 18,
     });
 
-    const textHeight = Math.max(70, lineas.length * 14 + 18);
+    const textHeight = Math.max(44, lineas.length * 14 + 12);
     const totalHeight = textHeight + 24;
 
     ensureSpace(totalHeight + 8);
@@ -508,6 +797,11 @@ export async function generarPdfReporteLocal(
     let textY = y - 30;
 
     lineas.forEach((linea) => {
+      if (!linea) {
+        textY -= 14;
+        return;
+      }
+
       page.drawText(linea, {
         x: marginX + 8,
         y: textY,
@@ -543,7 +837,102 @@ export async function generarPdfReporteLocal(
     });
   };
 
-  // ENCABEZADO CON LOGO
+  const chunkArray = <T,>(items: T[], size: number): T[][] => {
+    const chunks: T[][] = [];
+    for (let i = 0; i < items.length; i += size) {
+      chunks.push(items.slice(i, i + size));
+    }
+    return chunks;
+  };
+
+  const dibujarAnexosEnCuadricula = async (anexosImagen: any[]) => {
+    const grupos = chunkArray(anexosImagen, 4);
+
+    for (let grupoIndex = 0; grupoIndex < grupos.length; grupoIndex++) {
+      const grupo = grupos[grupoIndex];
+
+      nuevaPagina();
+      drawSectionTitle("9. ANEXOS", 520);
+
+      const COLUMNAS = 2;
+      const FILAS = 2;
+      const colGap = 14;
+      const rowGap = 14;
+      const cellWidth = (contentWidth - colGap) / 2;
+      const cellHeight = 250;
+
+      const startY = y - 8;
+
+      for (let i = 0; i < grupo.length; i++) {
+        const anexo = grupo[i];
+        const col = i % COLUMNAS;
+        const row = Math.floor(i / COLUMNAS);
+
+        const boxX = marginX + col * (cellWidth + colGap);
+        const boxTopY = startY - row * (cellHeight + rowGap);
+        const frameY = boxTopY - cellHeight;
+
+        page.drawRectangle({
+          x: boxX,
+          y: frameY,
+          width: cellWidth,
+          height: cellHeight,
+          borderWidth: 0.9,
+          borderColor: colorGrisLinea,
+        });
+
+        const rutaArchivo = anexo.urlArchivo;
+
+        if (!rutaArchivo || !fs.existsSync(rutaArchivo)) {
+          page.drawText("No se pudo cargar la imagen.", {
+            x: boxX + 8,
+            y: frameY + cellHeight / 2,
+            size: 9,
+            font: fontRegular,
+            color: colorTexto,
+          });
+          continue;
+        }
+
+        try {
+          const imagen = await incrustarImagenDesdeRuta({
+            pdfDoc,
+            rutaArchivo,
+          });
+
+          const dimensiones = imagen.scale(1);
+          const maxWidth = cellWidth - 12;
+          const maxHeight = cellHeight - 12;
+
+          const escala = Math.min(
+            maxWidth / dimensiones.width,
+            maxHeight / dimensiones.height
+          );
+
+          const width = dimensiones.width * escala;
+          const height = dimensiones.height * escala;
+
+          page.drawImage(imagen, {
+            x: boxX + (cellWidth - width) / 2,
+            y: frameY + (cellHeight - height) / 2,
+            width,
+            height,
+          });
+        } catch (_error) {
+          page.drawText("No se pudo incrustar la imagen.", {
+            x: boxX + 8,
+            y: frameY + cellHeight / 2,
+            size: 9,
+            font: fontRegular,
+            color: colorTexto,
+          });
+        }
+      }
+
+      y = startY - FILAS * cellHeight - rowGap - 18;
+    }
+  };
+
   page.drawRectangle({
     x: marginX,
     y: y - 56,
@@ -581,8 +970,7 @@ export async function generarPdfReporteLocal(
 
   y -= 74;
 
-  // 1. DATOS GENERALES
-  drawSectionTitle("1. DATOS GENERALES");
+  drawSectionTitle("1. DATOS GENERALES", 120);
   drawInfoBox("Información general", [
     { label: "Número de reporte", value: textoPlano(reporte.numeroReporte) },
     { label: "Fecha del reporte", value: formatearFecha(reporte.fechaReporte) },
@@ -591,43 +979,71 @@ export async function generarPdfReporteLocal(
     { label: "Visita ID", value: textoPlano(reporte.visitaId) },
   ]);
 
-  // 2. UNIDAD / EQUIPO
-  drawSectionTitle("2. UNIDAD / EQUIPO");
+  drawSectionTitle("2. UNIDAD / EQUIPO", 140);
   drawInfoBox("Unidad / equipo", [
-    { label: "Máquina", value: textoPlano(reporte.maquina?.nombreEquipo) },
+    { label: "Máquina", value: maquinaTexto },
     { label: "Marca", value: marcaEquipo },
     { label: "Modelo", value: textoPlano(reporte.maquina?.modelo) },
     { label: "Serie", value: textoPlano(reporte.maquina?.serie) },
-    { label: "Tipo de unidad", value: textoPlano(reporte.tipoUnidad?.nombre) },
+    { label: "Tipo de unidad", value: tipoUnidadTexto },
   ]);
 
-  // 3. PROCEDIMIENTO
-  drawSectionTitle("3. PROCEDIMIENTO");
+  drawSectionTitle("3. PROCEDIMIENTO", 200);
   drawTextAreaBox("Procedimiento realizado", textoProcedimiento);
 
-  // 4. HALLAZGOS
-  drawSectionTitle("4. HALLAZGOS");
+  nuevaPagina();
+  drawSectionTitle("4. HALLAZGOS", 160);
   drawTextAreaBox("Hallazgos encontrados", textoHallazgos);
 
-  // 5. CONCLUSIONES
-  drawSectionTitle("5. CONCLUSIONES");
+  drawSectionTitle("5. CONCLUSIONES", 100);
   drawTextAreaBox("Conclusiones", textoPlano(reporte.conclusiones));
 
-  // 6. OBSERVACIONES
-  drawSectionTitle("6. OBSERVACIONES");
+  drawSectionTitle("6. OBSERVACIONES", 100);
   drawTextAreaBox("Observaciones", textoPlano(reporte.observaciones));
 
-  // 7. PARÁMETROS TÉCNICOS
-  drawSectionTitle("7. PARÁMETROS TÉCNICOS");
+  drawSectionTitle("7. PARÁMETROS TÉCNICOS", 100);
   drawInfoBox("Parámetros", [
     { label: "PSI de succión", value: psiSuccion },
     { label: "Amperaje", value: amperaje },
   ]);
 
-  // 8. RECEPCIÓN DEL CLIENTE
-  if (tieneCierre) {
+  if (tieneAnexos) {
+    const anexosImagen = anexos.filter(
+      (anexo: any) =>
+        esRutaImagen(anexo.urlArchivo) ||
+        String(anexo.mimeType || "").toLowerCase().startsWith("image/")
+    );
+
+    const anexosNoImagen = anexos.filter(
+      (anexo: any) =>
+        !(
+          esRutaImagen(anexo.urlArchivo) ||
+          String(anexo.mimeType || "").toLowerCase().startsWith("image/")
+        )
+    );
+
+    if (anexosImagen.length) {
+      await dibujarAnexosEnCuadricula(anexosImagen);
+    }
+
+    if (anexosNoImagen.length) {
+      nuevaPagina();
+      drawSectionTitle("9. ANEXOS", 120);
+      drawTextAreaBox(
+        "Otros anexos",
+        anexosNoImagen
+          .map(
+            (anexo: any, index: number) =>
+              `- ${index + 1}. ${textoPlano(anexo.nombreArchivo)}`
+          )
+          .join("\n")
+      );
+    }
+  }
+
+  if (mostrarRecepcionTrabajo) {
     nuevaPagina();
-    drawSectionTitle("8. RECEPCIÓN DEL CLIENTE");
+    drawSectionTitle("8. RECEPCIÓN DE TRABAJO", 180);
 
     const rowsRecepcion: Array<{ label: string; value: string }> = [];
 
@@ -667,7 +1083,7 @@ export async function generarPdfReporteLocal(
     }
 
     if (rowsRecepcion.length) {
-      drawInfoBox("Recepción", rowsRecepcion);
+      drawInfoBox("Recepción de trabajo", rowsRecepcion);
     }
 
     if (tieneFirma) {
@@ -681,7 +1097,7 @@ export async function generarPdfReporteLocal(
 
       y -= 16;
 
-      ensureSpace(120);
+      ensureSpace(110);
 
       const resultadoFirma = await dibujarFirmaSiExiste({
         pdfDoc,
@@ -689,36 +1105,23 @@ export async function generarPdfReporteLocal(
         rutaFirma: cierre.urlFirma,
         x: marginX,
         y,
-        maxWidth: 200,
-        maxHeight: 90,
+        maxWidth: 170,
+        maxHeight: 70,
       });
 
       if (resultadoFirma.ok) {
         y -= resultadoFirma.heightUsed;
+      } else {
+        page.drawText("No fue posible cargar la firma guardada.", {
+          x: marginX,
+          y,
+          size: 9,
+          font: fontRegular,
+          color: colorTexto,
+        });
+        y -= 18;
       }
     }
-  }
-
-  // 9. ANEXOS
-  if (tieneAnexos) {
-    nuevaPagina();
-    drawSectionTitle("9. ANEXOS");
-
-    anexos.forEach((anexo: any, index: number) => {
-      drawInfoBox(`Anexo #${index + 1}`, [
-        { label: "Nombre", value: textoPlano(anexo.nombreArchivo) },
-        { label: "Tipo", value: textoPlano(anexo.tipoArchivo) },
-        { label: "MimeType", value: textoPlano(anexo.mimeType) },
-        {
-          label: "Tamaño",
-          value:
-            anexo.tamanoBytes !== null && anexo.tamanoBytes !== undefined
-              ? `${anexo.tamanoBytes} bytes`
-              : "N/D",
-        },
-        { label: "Ruta", value: textoPlano(anexo.urlArchivo) },
-      ]);
-    });
   }
 
   agregarNumeracionPaginas();

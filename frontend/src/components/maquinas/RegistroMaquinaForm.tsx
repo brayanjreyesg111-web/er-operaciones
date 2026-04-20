@@ -1,22 +1,28 @@
+import type { ChangeEvent } from 'react'
 import type { CatalogoItem } from '../../types/catalogos.types'
+import type { ClienteOption } from '../../types/clientes.types'
 import type { FormMaquina } from '../../types/maquinas.types'
 
 type Props = {
-  logoEr: string
   formMaquina: FormMaquina
   loadingCatalogos: boolean
   guardandoMaquina: boolean
   clienteSeleccionadoNombre: string
+  clientes: ClienteOption[]
+  selectedClienteId: string
+  allowClientSelection?: boolean
   tiposUnidad: CatalogoItem[]
   marcasCatalogo: CatalogoItem[]
   refrigerantesCatalogo: CatalogoItem[]
   unidadesMedidaCarga: CatalogoItem[]
   departamentos: CatalogoItem[]
   ciudades: CatalogoItem[]
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+  onSelectCliente: (e: ChangeEvent<HTMLSelectElement>) => void
   onBack: () => void
   onClear: () => void
   onSave: () => void
+  backLabel?: string
 }
 
 function textoRefrigerante(item: CatalogoItem) {
@@ -35,11 +41,13 @@ function textoRefrigerante(item: CatalogoItem) {
 }
 
 export default function RegistroMaquinaForm({
-  logoEr,
   formMaquina,
   loadingCatalogos,
   guardandoMaquina,
   clienteSeleccionadoNombre,
+  clientes,
+  selectedClienteId,
+  allowClientSelection = false,
   tiposUnidad,
   marcasCatalogo,
   refrigerantesCatalogo,
@@ -47,32 +55,36 @@ export default function RegistroMaquinaForm({
   departamentos,
   ciudades,
   onChange,
+  onSelectCliente,
   onBack,
   onClear,
   onSave,
+  backLabel = 'Regresar',
 }: Props) {
   return (
-    <section className="panel">
-      <div className="formTopBar">
-        <div className="formBrand">
-          <img src={logoEr} alt="Logo Expertos en Refrigeración" className="logoMini" />
-          <div>
-            <h2>Registrar máquina</h2>
-            <p>Los campos con catálogo se llenan desde catálogo, no libremente.</p>
-          </div>
-        </div>
-
-        <button className="btn btnGhost" onClick={onBack}>
-          Volver al reporte
-        </button>
-      </div>
-
-      <div className="secuenciaInfoBox">
-        <strong>Cliente seleccionado:</strong> {clienteSeleccionadoNombre || 'N/D'}
-      </div>
-
-      <div className="bloqueFormulario">
+    <section className="panel compactFormPanel">
+      <div className="bloqueFormulario compactOnlyFormBlock">
         <h3>Datos de la máquina</h3>
+
+        {allowClientSelection ? (
+          <div className="formGrid">
+            <div className="campo campoCompleto">
+              <label htmlFor="maqClienteId">Cliente *</label>
+              <select id="maqClienteId" value={selectedClienteId} onChange={onSelectCliente}>
+                <option value="">Seleccione cliente</option>
+                {clientes.map((cliente) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ) : (
+          <p className="subtleFormText">
+            Cliente seleccionado: <strong>{clienteSeleccionadoNombre || 'N/D'}</strong>
+          </p>
+        )}
 
         <div className="formGrid">
           <div className="campo">
@@ -127,28 +139,6 @@ export default function RegistroMaquinaForm({
           </div>
 
           <div className="campo">
-            <label htmlFor="maqModelo">Modelo</label>
-            <input
-              id="maqModelo"
-              name="modelo"
-              value={formMaquina.modelo}
-              onChange={onChange}
-              placeholder="Modelo"
-            />
-          </div>
-
-          <div className="campo">
-            <label htmlFor="maqSerie">Serie</label>
-            <input
-              id="maqSerie"
-              name="serie"
-              value={formMaquina.serie}
-              onChange={onChange}
-              placeholder="Serie"
-            />
-          </div>
-
-          <div className="campo">
             <label htmlFor="maqRefrigeranteId">Refrigerante *</label>
             <select
               id="maqRefrigeranteId"
@@ -177,25 +167,45 @@ export default function RegistroMaquinaForm({
               onChange={onChange}
               disabled={loadingCatalogos}
             >
-              <option value="">
-                {loadingCatalogos ? 'Cargando unidades...' : 'Seleccione unidad'}
-              </option>
+              <option value="">Seleccione unidad</option>
               {unidadesMedidaCarga.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.codigo ? `${item.codigo} - ${item.nombre}` : item.nombre}
+                  {item.codigo || item.nombre}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="campo">
-            <label htmlFor="maqCargaCantidad">Carga de refrigerante</label>
+            <label htmlFor="maqModelo">Modelo</label>
             <input
-              id="maqCargaCantidad"
+              id="maqModelo"
+              name="modelo"
+              value={formMaquina.modelo}
+              onChange={onChange}
+              placeholder="Modelo"
+            />
+          </div>
+
+          <div className="campo">
+            <label htmlFor="maqSerie">Serie</label>
+            <input
+              id="maqSerie"
+              name="serie"
+              value={formMaquina.serie}
+              onChange={onChange}
+              placeholder="Serie"
+            />
+          </div>
+
+          <div className="campo">
+            <label htmlFor="maqCargaRefrigeranteCantidad">Carga refrigerante</label>
+            <input
+              id="maqCargaRefrigeranteCantidad"
               name="cargaRefrigeranteCantidad"
               value={formMaquina.cargaRefrigeranteCantidad}
               onChange={onChange}
-              placeholder="Ej. 2.5"
+              placeholder="Cantidad"
             />
           </div>
 
@@ -278,15 +288,13 @@ export default function RegistroMaquinaForm({
       </div>
 
       <div className="barraAcciones">
-        <button className="btn btnGhost" onClick={onBack}>
-          Cancelar
+        <button className="btn btnGhost" onClick={onBack} type="button">
+          {backLabel}
         </button>
-
-        <button className="btn btnSecundario" onClick={onClear}>
+        <button className="btn btnSecundario" onClick={onClear} type="button">
           Limpiar máquina
         </button>
-
-        <button className="btn btnPrimario" onClick={onSave} disabled={guardandoMaquina}>
+        <button className="btn btnPrimario" onClick={onSave} disabled={guardandoMaquina} type="button">
           {guardandoMaquina ? 'Guardando máquina...' : 'Guardar máquina'}
         </button>
       </div>

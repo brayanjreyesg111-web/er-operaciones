@@ -1,0 +1,420 @@
+{
+  "meta": {
+    "generadoEn": "2026-04-17T14:18:34.355Z",
+    "modulo": "reportes",
+    "version": 5
+  },
+  "reporte": {
+    "id": 5,
+    "numeroReporte": "369",
+    "visitaId": 4,
+    "clienteId": 12,
+    "tecnicoId": 3,
+    "maquinaId": 11,
+    "tipoUnidadId": 4,
+    "procedimientoId": 13,
+    "tipoReporte": "individual",
+    "conclusiones": "Holaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "observaciones": "Holaaaaaaaaaaaaaaaaaaaaaaa",
+    "psi": "",
+    "amperaje": "18",
+    "requiereCotizacion": false,
+    "estado": "generado",
+    "fechaReporte": "2026-04-17T14:18:30.428Z",
+    "createdAt": "2026-04-17T14:18:30.443Z",
+    "updatedAt": "2026-04-17T14:18:30.443Z",
+    "urlPdf": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\01_Entregable_Cliente\\Reporte_369.pdf"
+  },
+  "relaciones": {
+    "visita": {
+      "id": 4,
+      "numeroVisita": null,
+      "ordenServicioId": null,
+      "clienteId": 12,
+      "tecnicoId": 3,
+      "actividadId": null,
+      "tipoVisita": "REPORTE_DIRECTO",
+      "motivoVisita": "Visita libre creada automáticamente desde el flujo directo de reportes.",
+      "resultadoBreve": "Pendiente de cierre mediante reporte técnico.",
+      "estado": "pendiente",
+      "motivoEstado": null,
+      "requiereCotizacion": false,
+      "esVisitaLibre": true,
+      "fechaVisita": "2026-04-17T14:18:29.884Z",
+      "horaInicio": null,
+      "horaFin": null,
+      "observaciones": "Generada automáticamente para sostener trazabilidad del reporte.",
+      "createdAt": "2026-04-17T14:18:29.910Z",
+      "updatedAt": "2026-04-17T14:18:29.910Z"
+    },
+    "cliente": {
+      "id": 12,
+      "nombre": "CL Pureba 123",
+      "rtn": "05101999008566",
+      "contactoNombre": "Brayan Reyes",
+      "telefono": "32117692",
+      "correo": "BR@gmail.com",
+      "direccion": "Datos de prueba",
+      "ubicacion": null,
+      "departamentoId": 4,
+      "ciudadId": 6,
+      "activo": true,
+      "createdAt": "2026-04-17T13:26:40.458Z",
+      "updatedAt": "2026-04-17T13:26:40.458Z"
+    },
+    "tecnico": {
+      "id": 3,
+      "nombre": "Tecnico General",
+      "email": "tecnico@er.local",
+      "passwordHash": "$2b$10$qJk5dBHl2D0RpjShhn9VEeRQ4tcbjmaeUArMw0db/8HleLlyTLVkq",
+      "activo": true,
+      "roleId": 3,
+      "createdAt": "2026-04-15T18:05:25.890Z",
+      "updatedAt": "2026-04-15T18:05:25.890Z"
+    },
+    "maquina": {
+      "id": 11,
+      "clienteId": 12,
+      "tipoUnidadId": 4,
+      "marcaId": 4,
+      "refrigeranteId": 3,
+      "unidadMedidaCargaId": 1,
+      "departamentoId": 17,
+      "ciudadId": 26,
+      "codigoInterno": "CHILLER_CARRIER_RD350_000897861ASEE_NACAOME_SALA_DE_MAQUINAS",
+      "tipoEquipo": "CHILLER",
+      "marca": "CARRIER",
+      "modelo": "RD350",
+      "serie": "000897861asee",
+      "cargaRefrigeranteCantidad": "5",
+      "direccionExacta": "desvios al agua zarca",
+      "area": "Sala de maquinas",
+      "observaciones": null,
+      "activo": true,
+      "createdAt": "2026-04-17T13:27:52.310Z",
+      "updatedAt": "2026-04-17T13:27:52.310Z"
+    },
+    "tipoUnidad": {
+      "id": 4,
+      "codigo": "TU-004",
+      "nombre": "CHILLER",
+      "descripcion": "Chiller industrial",
+      "activo": true,
+      "createdAt": "2026-04-06T22:06:04.109Z",
+      "updatedAt": "2026-04-06T22:06:04.109Z"
+    },
+    "procedimiento": {
+      "id": 13,
+      "codigo": "PROC-003",
+      "nombre": "Revisión de presiones y amperaje",
+      "descripcionCompletaPdf": "Se midieron presiones del sistema y consumo eléctrico del equipo para comparar contra rangos esperados y determinar comportamiento operativo.",
+      "activo": true,
+      "createdAt": "2026-04-14T17:28:08.938Z",
+      "updatedAt": "2026-04-14T17:28:08.938Z"
+    }
+  },
+  "detallesMaquinas": [
+    {
+      "id": 5,
+      "reporteId": 5,
+      "maquinaId": 11,
+      "tipoUnidadId": 4,
+      "procedimientoId": 13,
+      "procedimiento": null,
+      "tituloActividad": "Revisión de presiones y amperaje",
+      "descripcionActividadPdf": "Se midieron presiones del sistema y consumo eléctrico del equipo para comparar contra rangos esperados y determinar comportamiento operativo.",
+      "hallazgosTexto": "H-004: Capacitor fuera de rango | H-005: Terminal floja en contactor | H-09: Protección eléctrica disparada o inestable. | H-10: Componente eléctrico defectuoso. | H-001: Fuga detectada en línea de succión | H-002: Presión por debajo del rango esperado | H-003: Escarcha anormal en evaporador",
+      "diagnostico": null,
+      "trabajoRealizado": null,
+      "recomendaciones": null,
+      "psi": "",
+      "amperaje": "18",
+      "observaciones": "Holaaaaaaaaaaaaaaaaaaaaaaa",
+      "createdAt": "2026-04-17T14:18:30.488Z",
+      "updatedAt": "2026-04-17T14:18:30.488Z",
+      "maquina": {
+        "id": 11,
+        "clienteId": 12,
+        "tipoUnidadId": 4,
+        "marcaId": 4,
+        "refrigeranteId": 3,
+        "unidadMedidaCargaId": 1,
+        "departamentoId": 17,
+        "ciudadId": 26,
+        "codigoInterno": "CHILLER_CARRIER_RD350_000897861ASEE_NACAOME_SALA_DE_MAQUINAS",
+        "tipoEquipo": "CHILLER",
+        "marca": "CARRIER",
+        "modelo": "RD350",
+        "serie": "000897861asee",
+        "cargaRefrigeranteCantidad": "5",
+        "direccionExacta": "desvios al agua zarca",
+        "area": "Sala de maquinas",
+        "observaciones": null,
+        "activo": true,
+        "createdAt": "2026-04-17T13:27:52.310Z",
+        "updatedAt": "2026-04-17T13:27:52.310Z"
+      },
+      "tipoUnidad": {
+        "id": 4,
+        "codigo": "TU-004",
+        "nombre": "CHILLER",
+        "descripcion": "Chiller industrial",
+        "activo": true,
+        "createdAt": "2026-04-06T22:06:04.109Z",
+        "updatedAt": "2026-04-06T22:06:04.109Z"
+      },
+      "procedimientoCatalogo": {
+        "id": 13,
+        "codigo": "PROC-003",
+        "nombre": "Revisión de presiones y amperaje",
+        "descripcionCompletaPdf": "Se midieron presiones del sistema y consumo eléctrico del equipo para comparar contra rangos esperados y determinar comportamiento operativo.",
+        "activo": true,
+        "createdAt": "2026-04-14T17:28:08.938Z",
+        "updatedAt": "2026-04-14T17:28:08.938Z"
+      },
+      "hallazgos": [
+        {
+          "id": 25,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 24,
+          "codigoHallazgo": "H-004",
+          "descripcionHallazgo": "Capacitor fuera de rango",
+          "createdAt": "2026-04-17T14:18:30.500Z",
+          "hallazgoCatalogo": {
+            "id": 24,
+            "codigo": "H-004",
+            "categoria": "Eléctrico",
+            "descripcion": "Capacitor fuera de rango",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 26,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 25,
+          "codigoHallazgo": "H-005",
+          "descripcionHallazgo": "Terminal floja en contactor",
+          "createdAt": "2026-04-17T14:18:30.509Z",
+          "hallazgoCatalogo": {
+            "id": 25,
+            "codigo": "H-005",
+            "categoria": "Eléctrico",
+            "descripcion": "Terminal floja en contactor",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 27,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 9,
+          "codigoHallazgo": "H-09",
+          "descripcionHallazgo": "Protección eléctrica disparada o inestable.",
+          "createdAt": "2026-04-17T14:18:30.515Z",
+          "hallazgoCatalogo": {
+            "id": 9,
+            "codigo": "H-09",
+            "categoria": "Eléctrico",
+            "descripcion": "Protección eléctrica disparada o inestable.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 28,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 10,
+          "codigoHallazgo": "H-10",
+          "descripcionHallazgo": "Componente eléctrico defectuoso.",
+          "createdAt": "2026-04-17T14:18:30.522Z",
+          "hallazgoCatalogo": {
+            "id": 10,
+            "codigo": "H-10",
+            "categoria": "Eléctrico",
+            "descripcion": "Componente eléctrico defectuoso.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 29,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 21,
+          "codigoHallazgo": "H-001",
+          "descripcionHallazgo": "Fuga detectada en línea de succión",
+          "createdAt": "2026-04-17T14:18:30.528Z",
+          "hallazgoCatalogo": {
+            "id": 21,
+            "codigo": "H-001",
+            "categoria": "Refrigeración",
+            "descripcion": "Fuga detectada en línea de succión",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 30,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 22,
+          "codigoHallazgo": "H-002",
+          "descripcionHallazgo": "Presión por debajo del rango esperado",
+          "createdAt": "2026-04-17T14:18:30.534Z",
+          "hallazgoCatalogo": {
+            "id": 22,
+            "codigo": "H-002",
+            "categoria": "Refrigeración",
+            "descripcion": "Presión por debajo del rango esperado",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 31,
+          "reporteDetalleMaquinaId": 5,
+          "hallazgoCatalogoId": 23,
+          "codigoHallazgo": "H-003",
+          "descripcionHallazgo": "Escarcha anormal en evaporador",
+          "createdAt": "2026-04-17T14:18:30.541Z",
+          "hallazgoCatalogo": {
+            "id": 23,
+            "codigo": "H-003",
+            "categoria": "Refrigeración",
+            "descripcion": "Escarcha anormal en evaporador",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        }
+      ]
+    }
+  ],
+  "anexos": [
+    {
+      "id": 18,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510549_IMG-20240804-WA0008.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510549_IMG-20240804-WA0008.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 179253,
+      "createdAt": "2026-04-17T14:18:30.555Z"
+    },
+    {
+      "id": 19,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510564_IMG-20240804-WA0009.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510564_IMG-20240804-WA0009.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 170997,
+      "createdAt": "2026-04-17T14:18:30.569Z"
+    },
+    {
+      "id": 20,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510574_IMG-20240804-WA0010.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510574_IMG-20240804-WA0010.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 170419,
+      "createdAt": "2026-04-17T14:18:30.576Z"
+    },
+    {
+      "id": 21,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510587_IMG-20240804-WA0014.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510587_IMG-20240804-WA0014.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 123329,
+      "createdAt": "2026-04-17T14:18:30.589Z"
+    },
+    {
+      "id": 22,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510595_IMG-20240804-WA0015.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510595_IMG-20240804-WA0015.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 182203,
+      "createdAt": "2026-04-17T14:18:30.597Z"
+    },
+    {
+      "id": 23,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510602_IMG-20240804-WA0016.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510602_IMG-20240804-WA0016.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 140960,
+      "createdAt": "2026-04-17T14:18:30.604Z"
+    },
+    {
+      "id": 24,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510608_IMG-20240804-WA0020.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510608_IMG-20240804-WA0020.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 144973,
+      "createdAt": "2026-04-17T14:18:30.610Z"
+    },
+    {
+      "id": 25,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510615_IMG-20240804-WA0021.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510615_IMG-20240804-WA0021.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 245391,
+      "createdAt": "2026-04-17T14:18:30.616Z"
+    },
+    {
+      "id": 26,
+      "reporteId": 5,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776435510625_IMG-20240804-WA0022.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos\\1776435510625_IMG-20240804-WA0022.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 235361,
+      "createdAt": "2026-04-17T14:18:30.627Z"
+    }
+  ],
+  "cierre": null,
+  "pdf": {
+    "rutaPdfInterno": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\pdf\\Reporte_369.pdf",
+    "rutaPdfEntregable": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\01_Entregable_Cliente\\Reporte_369.pdf"
+  },
+  "storage": {
+    "numeroReporte": "369",
+    "nombreCarpetaReporte": "Reporte_369",
+    "rutas": {
+      "baseStorageDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage",
+      "reportesBaseDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes",
+      "reporteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369",
+      "entregableClienteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\01_Entregable_Cliente",
+      "internoDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno",
+      "anexosDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\anexos",
+      "firmasDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\firmas",
+      "pdfDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\pdf",
+      "jsonDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_369\\99_Interno\\json"
+    },
+    "yaExistia": false
+  }
+}

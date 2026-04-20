@@ -1,0 +1,511 @@
+{
+  "meta": {
+    "generadoEn": "2026-04-17T13:29:24.512Z",
+    "modulo": "reportes",
+    "version": 5
+  },
+  "reporte": {
+    "id": 2,
+    "numeroReporte": "366",
+    "visitaId": 2,
+    "clienteId": 12,
+    "tecnicoId": 2,
+    "maquinaId": 11,
+    "tipoUnidadId": 4,
+    "procedimientoId": 3,
+    "tipoReporte": "individual",
+    "conclusiones": "Registro de prueba 45",
+    "observaciones": "Registro de prueba 45",
+    "psi": "45",
+    "amperaje": "18",
+    "requiereCotizacion": false,
+    "estado": "generado",
+    "fechaReporte": "2026-04-17T13:29:20.964Z",
+    "createdAt": "2026-04-17T13:29:20.970Z",
+    "updatedAt": "2026-04-17T13:29:20.970Z",
+    "urlPdf": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\01_Entregable_Cliente\\Reporte_366.pdf"
+  },
+  "relaciones": {
+    "visita": {
+      "id": 2,
+      "numeroVisita": null,
+      "ordenServicioId": null,
+      "clienteId": 12,
+      "tecnicoId": 2,
+      "actividadId": null,
+      "tipoVisita": "REPORTE_DIRECTO",
+      "motivoVisita": "Visita libre creada automáticamente desde el flujo directo de reportes.",
+      "resultadoBreve": "Pendiente de cierre mediante reporte técnico.",
+      "estado": "pendiente",
+      "motivoEstado": null,
+      "requiereCotizacion": false,
+      "esVisitaLibre": true,
+      "fechaVisita": "2026-04-17T13:29:20.643Z",
+      "horaInicio": null,
+      "horaFin": null,
+      "observaciones": "Generada automáticamente para sostener trazabilidad del reporte.",
+      "createdAt": "2026-04-17T13:29:20.644Z",
+      "updatedAt": "2026-04-17T13:29:20.644Z"
+    },
+    "cliente": {
+      "id": 12,
+      "nombre": "CL Pureba 123",
+      "rtn": "05101999008566",
+      "contactoNombre": "Brayan Reyes",
+      "telefono": "32117692",
+      "correo": "BR@gmail.com",
+      "direccion": "Datos de prueba",
+      "ubicacion": null,
+      "departamentoId": 4,
+      "ciudadId": 6,
+      "activo": true,
+      "createdAt": "2026-04-17T13:26:40.458Z",
+      "updatedAt": "2026-04-17T13:26:40.458Z"
+    },
+    "tecnico": {
+      "id": 2,
+      "nombre": "Supervisor General",
+      "email": "supervisor@er.local",
+      "passwordHash": "$2b$10$qJk5dBHl2D0RpjShhn9VEeRQ4tcbjmaeUArMw0db/8HleLlyTLVkq",
+      "activo": true,
+      "roleId": 2,
+      "createdAt": "2026-04-15T18:05:25.890Z",
+      "updatedAt": "2026-04-15T18:05:25.890Z"
+    },
+    "maquina": {
+      "id": 11,
+      "clienteId": 12,
+      "tipoUnidadId": 4,
+      "marcaId": 4,
+      "refrigeranteId": 3,
+      "unidadMedidaCargaId": 1,
+      "departamentoId": 17,
+      "ciudadId": 26,
+      "codigoInterno": "CHILLER_CARRIER_RD350_000897861ASEE_NACAOME_SALA_DE_MAQUINAS",
+      "tipoEquipo": "CHILLER",
+      "marca": "CARRIER",
+      "modelo": "RD350",
+      "serie": "000897861asee",
+      "cargaRefrigeranteCantidad": "5",
+      "direccionExacta": "desvios al agua zarca",
+      "area": "Sala de maquinas",
+      "observaciones": null,
+      "activo": true,
+      "createdAt": "2026-04-17T13:27:52.310Z",
+      "updatedAt": "2026-04-17T13:27:52.310Z"
+    },
+    "tipoUnidad": {
+      "id": 4,
+      "codigo": "TU-004",
+      "nombre": "CHILLER",
+      "descripcion": "Chiller industrial",
+      "activo": true,
+      "createdAt": "2026-04-06T22:06:04.109Z",
+      "updatedAt": "2026-04-06T22:06:04.109Z"
+    },
+    "procedimiento": {
+      "id": 3,
+      "codigo": "P-03",
+      "nombre": "Revisión de fugas y carga de refrigerante",
+      "descripcionCompletaPdf": "1. Inspección general del circuito de refrigeración.\r\n2. Búsqueda de indicios de fuga en conexiones y componentes.\r\n3. Confirmación técnica del punto afectado.\r\n4. Corrección o aislamiento del punto intervenido, si aplica.\r\n5. Vacío y carga de refrigerante según condición del sistema.\r\n6. Verificación de presiones finales y comportamiento del equipo.\r\n7. Registro de parámetros y observaciones finales.",
+      "activo": true,
+      "createdAt": "2026-04-06T22:25:41.903Z",
+      "updatedAt": "2026-04-06T22:25:41.903Z"
+    }
+  },
+  "detallesMaquinas": [
+    {
+      "id": 2,
+      "reporteId": 2,
+      "maquinaId": 11,
+      "tipoUnidadId": 4,
+      "procedimientoId": 3,
+      "procedimiento": null,
+      "tituloActividad": "Revisión de fugas y carga de refrigerante",
+      "descripcionActividadPdf": "1. Inspección general del circuito de refrigeración.\r\n2. Búsqueda de indicios de fuga en conexiones y componentes.\r\n3. Confirmación técnica del punto afectado.\r\n4. Corrección o aislamiento del punto intervenido, si aplica.\r\n5. Vacío y carga de refrigerante según condición del sistema.\r\n6. Verificación de presiones finales y comportamiento del equipo.\r\n7. Registro de parámetros y observaciones finales.",
+      "hallazgosTexto": "H-004: Capacitor fuera de rango | H-005: Terminal floja en contactor | H-006: Protector térmico disparado | H-18: Equipo requiere limpieza general. | H-20: Sin hallazgos críticos al momento de la visita. | H-008: Vibración excesiva en compresor | H-009: Ventilador con desgaste en rodamiento | H-16: Operación intermitente. | H-15: Equipo fuera de servicio al momento de la revisión. | H-001: Fuga detectada en línea de succión | H-01: Presión fuera de rango. | H-02: Posible fuga de refrigerante. | H-03: Baja carga de refrigerante.",
+      "diagnostico": null,
+      "trabajoRealizado": null,
+      "recomendaciones": null,
+      "psi": "45",
+      "amperaje": "18",
+      "observaciones": "Registro de prueba 45",
+      "createdAt": "2026-04-17T13:29:21.017Z",
+      "updatedAt": "2026-04-17T13:29:21.017Z",
+      "maquina": {
+        "id": 11,
+        "clienteId": 12,
+        "tipoUnidadId": 4,
+        "marcaId": 4,
+        "refrigeranteId": 3,
+        "unidadMedidaCargaId": 1,
+        "departamentoId": 17,
+        "ciudadId": 26,
+        "codigoInterno": "CHILLER_CARRIER_RD350_000897861ASEE_NACAOME_SALA_DE_MAQUINAS",
+        "tipoEquipo": "CHILLER",
+        "marca": "CARRIER",
+        "modelo": "RD350",
+        "serie": "000897861asee",
+        "cargaRefrigeranteCantidad": "5",
+        "direccionExacta": "desvios al agua zarca",
+        "area": "Sala de maquinas",
+        "observaciones": null,
+        "activo": true,
+        "createdAt": "2026-04-17T13:27:52.310Z",
+        "updatedAt": "2026-04-17T13:27:52.310Z"
+      },
+      "tipoUnidad": {
+        "id": 4,
+        "codigo": "TU-004",
+        "nombre": "CHILLER",
+        "descripcion": "Chiller industrial",
+        "activo": true,
+        "createdAt": "2026-04-06T22:06:04.109Z",
+        "updatedAt": "2026-04-06T22:06:04.109Z"
+      },
+      "procedimientoCatalogo": {
+        "id": 3,
+        "codigo": "P-03",
+        "nombre": "Revisión de fugas y carga de refrigerante",
+        "descripcionCompletaPdf": "1. Inspección general del circuito de refrigeración.\r\n2. Búsqueda de indicios de fuga en conexiones y componentes.\r\n3. Confirmación técnica del punto afectado.\r\n4. Corrección o aislamiento del punto intervenido, si aplica.\r\n5. Vacío y carga de refrigerante según condición del sistema.\r\n6. Verificación de presiones finales y comportamiento del equipo.\r\n7. Registro de parámetros y observaciones finales.",
+        "activo": true,
+        "createdAt": "2026-04-06T22:25:41.903Z",
+        "updatedAt": "2026-04-06T22:25:41.903Z"
+      },
+      "hallazgos": [
+        {
+          "id": 12,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 24,
+          "codigoHallazgo": "H-004",
+          "descripcionHallazgo": "Capacitor fuera de rango",
+          "createdAt": "2026-04-17T13:29:21.028Z",
+          "hallazgoCatalogo": {
+            "id": 24,
+            "codigo": "H-004",
+            "categoria": "Eléctrico",
+            "descripcion": "Capacitor fuera de rango",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 13,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 25,
+          "codigoHallazgo": "H-005",
+          "descripcionHallazgo": "Terminal floja en contactor",
+          "createdAt": "2026-04-17T13:29:21.036Z",
+          "hallazgoCatalogo": {
+            "id": 25,
+            "codigo": "H-005",
+            "categoria": "Eléctrico",
+            "descripcion": "Terminal floja en contactor",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 14,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 26,
+          "codigoHallazgo": "H-006",
+          "descripcionHallazgo": "Protector térmico disparado",
+          "createdAt": "2026-04-17T13:29:21.042Z",
+          "hallazgoCatalogo": {
+            "id": 26,
+            "codigo": "H-006",
+            "categoria": "Eléctrico",
+            "descripcion": "Protector térmico disparado",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 15,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 18,
+          "codigoHallazgo": "H-18",
+          "descripcionHallazgo": "Equipo requiere limpieza general.",
+          "createdAt": "2026-04-17T13:29:21.048Z",
+          "hallazgoCatalogo": {
+            "id": 18,
+            "codigo": "H-18",
+            "categoria": "General",
+            "descripcion": "Equipo requiere limpieza general.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 16,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 20,
+          "codigoHallazgo": "H-20",
+          "descripcionHallazgo": "Sin hallazgos críticos al momento de la visita.",
+          "createdAt": "2026-04-17T13:29:21.054Z",
+          "hallazgoCatalogo": {
+            "id": 20,
+            "codigo": "H-20",
+            "categoria": "General",
+            "descripcion": "Sin hallazgos críticos al momento de la visita.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 17,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 28,
+          "codigoHallazgo": "H-008",
+          "descripcionHallazgo": "Vibración excesiva en compresor",
+          "createdAt": "2026-04-17T13:29:21.059Z",
+          "hallazgoCatalogo": {
+            "id": 28,
+            "codigo": "H-008",
+            "categoria": "Mecánico",
+            "descripcion": "Vibración excesiva en compresor",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 18,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 29,
+          "codigoHallazgo": "H-009",
+          "descripcionHallazgo": "Ventilador con desgaste en rodamiento",
+          "createdAt": "2026-04-17T13:29:21.065Z",
+          "hallazgoCatalogo": {
+            "id": 29,
+            "codigo": "H-009",
+            "categoria": "Mecánico",
+            "descripcion": "Ventilador con desgaste en rodamiento",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 19,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 16,
+          "codigoHallazgo": "H-16",
+          "descripcionHallazgo": "Operación intermitente.",
+          "createdAt": "2026-04-17T13:29:21.071Z",
+          "hallazgoCatalogo": {
+            "id": 16,
+            "codigo": "H-16",
+            "categoria": "Operación",
+            "descripcion": "Operación intermitente.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 20,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 15,
+          "codigoHallazgo": "H-15",
+          "descripcionHallazgo": "Equipo fuera de servicio al momento de la revisión.",
+          "createdAt": "2026-04-17T13:29:21.077Z",
+          "hallazgoCatalogo": {
+            "id": 15,
+            "codigo": "H-15",
+            "categoria": "Operación",
+            "descripcion": "Equipo fuera de servicio al momento de la revisión.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 21,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 21,
+          "codigoHallazgo": "H-001",
+          "descripcionHallazgo": "Fuga detectada en línea de succión",
+          "createdAt": "2026-04-17T13:29:21.083Z",
+          "hallazgoCatalogo": {
+            "id": 21,
+            "codigo": "H-001",
+            "categoria": "Refrigeración",
+            "descripcion": "Fuga detectada en línea de succión",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 22,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 1,
+          "codigoHallazgo": "H-01",
+          "descripcionHallazgo": "Presión fuera de rango.",
+          "createdAt": "2026-04-17T13:29:21.089Z",
+          "hallazgoCatalogo": {
+            "id": 1,
+            "codigo": "H-01",
+            "categoria": "Refrigeración",
+            "descripcion": "Presión fuera de rango.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 23,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 2,
+          "codigoHallazgo": "H-02",
+          "descripcionHallazgo": "Posible fuga de refrigerante.",
+          "createdAt": "2026-04-17T13:29:21.096Z",
+          "hallazgoCatalogo": {
+            "id": 2,
+            "codigo": "H-02",
+            "categoria": "Refrigeración",
+            "descripcion": "Posible fuga de refrigerante.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 24,
+          "reporteDetalleMaquinaId": 2,
+          "hallazgoCatalogoId": 3,
+          "codigoHallazgo": "H-03",
+          "descripcionHallazgo": "Baja carga de refrigerante.",
+          "createdAt": "2026-04-17T13:29:21.101Z",
+          "hallazgoCatalogo": {
+            "id": 3,
+            "codigo": "H-03",
+            "categoria": "Refrigeración",
+            "descripcion": "Baja carga de refrigerante.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        }
+      ]
+    }
+  ],
+  "anexos": [
+    {
+      "id": 10,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561108_IMG-20240804-WA0008.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561108_IMG-20240804-WA0008.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 179253,
+      "createdAt": "2026-04-17T13:29:21.110Z"
+    },
+    {
+      "id": 11,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561115_IMG-20240804-WA0009.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561115_IMG-20240804-WA0009.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 170997,
+      "createdAt": "2026-04-17T13:29:21.117Z"
+    },
+    {
+      "id": 12,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561122_IMG-20240804-WA0010.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561122_IMG-20240804-WA0010.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 170419,
+      "createdAt": "2026-04-17T13:29:21.124Z"
+    },
+    {
+      "id": 13,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561128_IMG-20240804-WA0011.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561128_IMG-20240804-WA0011.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 121788,
+      "createdAt": "2026-04-17T13:29:21.130Z"
+    },
+    {
+      "id": 14,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561134_IMG-20240804-WA0014.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561134_IMG-20240804-WA0014.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 123329,
+      "createdAt": "2026-04-17T13:29:21.136Z"
+    },
+    {
+      "id": 15,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561140_IMG-20240804-WA0015.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561140_IMG-20240804-WA0015.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 182203,
+      "createdAt": "2026-04-17T13:29:21.142Z"
+    },
+    {
+      "id": 16,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561147_IMG-20240804-WA0016.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561147_IMG-20240804-WA0016.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 140960,
+      "createdAt": "2026-04-17T13:29:21.148Z"
+    },
+    {
+      "id": 17,
+      "reporteId": 2,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1776432561153_IMG-20240804-WA0017.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos\\1776432561153_IMG-20240804-WA0017.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 71655,
+      "createdAt": "2026-04-17T13:29:21.154Z"
+    }
+  ],
+  "cierre": null,
+  "pdf": {
+    "rutaPdfInterno": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\pdf\\Reporte_366.pdf",
+    "rutaPdfEntregable": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\01_Entregable_Cliente\\Reporte_366.pdf"
+  },
+  "storage": {
+    "numeroReporte": "366",
+    "nombreCarpetaReporte": "Reporte_366",
+    "rutas": {
+      "baseStorageDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage",
+      "reportesBaseDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes",
+      "reporteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366",
+      "entregableClienteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\01_Entregable_Cliente",
+      "internoDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno",
+      "anexosDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\anexos",
+      "firmasDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\firmas",
+      "pdfDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\pdf",
+      "jsonDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_366\\99_Interno\\json"
+    },
+    "yaExistia": false
+  }
+}

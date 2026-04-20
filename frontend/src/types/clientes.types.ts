@@ -9,7 +9,7 @@ export type MaquinaOption = {
   codigoInterno?: string | null
   modelo?: string | null
   serie?: string | null
-  activo?: boolean
+  activo?: boolean | null
 }
 
 export type FormCliente = {
@@ -19,39 +19,8 @@ export type FormCliente = {
   telefono: string
   correo: string
   direccion: string
-  ubicacion: string
-}
-
-export type ClientesListResponse = {
-  ok: boolean
-  data: Array<{
-    id: number
-    nombre: string
-  }>
-}
-
-export type ClienteDetalleResponse = {
-  ok: boolean
-  data: {
-    id: number
-    nombre: string
-    maquinas?: Array<{
-      id: number
-      codigoInterno?: string | null
-      modelo?: string | null
-      serie?: string | null
-      activo?: boolean
-    }>
-  }
-}
-
-export type CrearClienteResponse = {
-  ok: boolean
-  mensaje?: string
-  data?: {
-    id: number
-    nombre: string
-  }
+  departamentoId: string
+  ciudadId: string
 }
 
 export const FORM_CLIENTE_INICIAL: FormCliente = {
@@ -61,5 +30,6 @@ export const FORM_CLIENTE_INICIAL: FormCliente = {
   telefono: '',
   correo: '',
   direccion: '',
-  ubicacion: '',
+  departamentoId: '',
+  ciudadId: '',
 }

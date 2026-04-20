@@ -1,50 +1,55 @@
+import type { ChangeEvent } from 'react'
+import type { CatalogoItem } from '../../types/catalogos.types'
 import type { FormCliente } from '../../types/clientes.types'
 
 type Props = {
-  logoEr: string
   formCliente: FormCliente
   guardandoCliente: boolean
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  loadingCatalogos: boolean
+  departamentos: CatalogoItem[]
+  ciudades: CatalogoItem[]
+  onChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void
   onBack: () => void
   onClear: () => void
   onSave: () => void
+  backLabel?: string
 }
 
 export default function RegistroClienteForm({
-  logoEr,
   formCliente,
   guardandoCliente,
+  loadingCatalogos,
+  departamentos,
+  ciudades,
   onChange,
   onBack,
   onClear,
   onSave,
+  backLabel = 'Regresar',
 }: Props) {
   return (
-    <section className="panel">
-      <div className="formTopBar">
-        <div className="formBrand">
-          <img src={logoEr} alt="Logo Expertos en Refrigeración" className="logoMini" />
-          <div>
-            <h2>Registrar cliente</h2>
-            <p>Primero cliente; después seguiremos con máquina.</p>
-          </div>
-        </div>
-
-        <button className="btn btnGhost" onClick={onBack}>
-          Volver al reporte
-        </button>
+    <section className="panel compactFormPanel">
+      <div className="compactFormHeader">
+        <span className="sectionCaption">Catálogo base</span>
+        <h2>Registro de cliente</h2>
+        <p className="textoIntroCompacto">
+          Crea el cliente una sola vez y úsalo después en máquinas, visitas y reportes.
+        </p>
       </div>
 
-      <div className="secuenciaInfoBox">
-        <strong>Secuencia actual:</strong> Registrar cliente → volver al reporte → luego registrar máquina.
-      </div>
-
-      <div className="bloqueFormulario">
-        <h3>Datos del cliente</h3>
+      <div className="bloqueFormulario compactOnlyFormBlock">
+        <h3>Datos generales</h3>
+        <p className="subtleFormText">
+          Completa primero la información principal del cliente. Los campos marcados con <span className="requiredDot">*</span> son obligatorios.
+        </p>
 
         <div className="formGrid">
           <div className="campo">
-            <label htmlFor="clienteNombre">Nombre del cliente *</label>
+            <label htmlFor="clienteNombre">
+              Nombre del cliente <span className="requiredDot">*</span>
+            </label>
             <input
               id="clienteNombre"
               name="nombre"
@@ -92,6 +97,7 @@ export default function RegistroClienteForm({
             <input
               id="clienteCorreo"
               name="correo"
+              type="email"
               value={formCliente.correo}
               onChange={onChange}
               placeholder="Correo electrónico"
@@ -99,14 +105,49 @@ export default function RegistroClienteForm({
           </div>
 
           <div className="campo">
-            <label htmlFor="clienteUbicacion">Ubicación</label>
-            <input
-              id="clienteUbicacion"
-              name="ubicacion"
-              value={formCliente.ubicacion}
+            <label htmlFor="clienteDepartamentoId">
+              Departamento <span className="requiredDot">*</span>
+            </label>
+            <select
+              id="clienteDepartamentoId"
+              name="departamentoId"
+              value={formCliente.departamentoId}
               onChange={onChange}
-              placeholder="Ciudad / departamento"
-            />
+              disabled={loadingCatalogos}
+            >
+              <option value="">
+                {loadingCatalogos ? 'Cargando departamentos...' : 'Seleccione departamento'}
+              </option>
+              {departamentos.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="campo">
+            <label htmlFor="clienteCiudadId">
+              Ciudad <span className="requiredDot">*</span>
+            </label>
+            <select
+              id="clienteCiudadId"
+              name="ciudadId"
+              value={formCliente.ciudadId}
+              onChange={onChange}
+              disabled={!formCliente.departamentoId}
+            >
+              <option value="">
+                {!formCliente.departamentoId
+                  ? 'Seleccione primero departamento'
+                  : 'Seleccione ciudad'}
+              </option>
+              {ciudades.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.nombre}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="campo campoCompleto">
@@ -124,18 +165,17 @@ export default function RegistroClienteForm({
       </div>
 
       <div className="barraAcciones">
-        <button className="btn btnGhost" onClick={onBack}>
-          Cancelar
+        <button className="btn btnGhost" onClick={onBack} type="button">
+          {backLabel}
         </button>
-
-        <button className="btn btnSecundario" onClick={onClear}>
+        <button className="btn btnSecundario" onClick={onClear} type="button">
           Limpiar cliente
         </button>
-
-        <button className="btn btnPrimario" onClick={onSave} disabled={guardandoCliente}>
+        <button className="btn btnPrimario" onClick={onSave} disabled={guardandoCliente} type="button">
           {guardandoCliente ? 'Guardando cliente...' : 'Guardar cliente'}
         </button>
       </div>
     </section>
   )
 }
+

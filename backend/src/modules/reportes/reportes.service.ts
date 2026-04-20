@@ -177,6 +177,28 @@ async function validarDetalleMaquina(detalle: CrearDetalleReporteInput) {
       }
     }
   }
+
+  return maquina;
+}
+
+function construirHallazgosTextoDesdeInput(
+  hallazgos?: CrearHallazgoDetalleInput[]
+): string | null {
+  if (!hallazgos?.length) return null;
+
+  const textos = hallazgos
+    .map((hallazgo) => {
+      const codigo = hallazgo.codigoHallazgo?.trim() || "";
+      const descripcion = hallazgo.descripcionHallazgo?.trim() || "";
+
+      if (codigo && descripcion) return `${codigo}: ${descripcion}`;
+      if (descripcion) return descripcion;
+      if (codigo) return codigo;
+      return "";
+    })
+    .filter(Boolean);
+
+  return textos.length ? textos.join(" | ") : null;
 }
 
 async function crearDetallesYHallazgos(
@@ -186,18 +208,28 @@ async function crearDetallesYHallazgos(
   const detallesCreados = [];
 
   for (const detalle of detallesMaquinas) {
-    await validarDetalleMaquina(detalle);
+    const maquina = await validarDetalleMaquina(detalle);
+
+    const tipoUnidadIdFinal =
+      detalle.tipoUnidadId !== undefined && detalle.tipoUnidadId !== null
+        ? detalle.tipoUnidadId
+        : maquina.tipoUnidadId ?? null;
+
+    const hallazgosTextoFinal =
+      detalle.hallazgosTexto?.trim() ||
+      construirHallazgosTextoDesdeInput(detalle.hallazgos) ||
+      null;
 
     const detalleCreado = await prisma.reporteDetalleMaquina.create({
       data: {
         reporteId,
         maquinaId: detalle.maquinaId,
-        tipoUnidadId: detalle.tipoUnidadId ?? null,
+        tipoUnidadId: tipoUnidadIdFinal,
         procedimientoId: detalle.procedimientoId ?? null,
         procedimiento: detalle.procedimiento ?? null,
         tituloActividad: detalle.tituloActividad ?? null,
         descripcionActividadPdf: detalle.descripcionActividadPdf ?? null,
-        hallazgosTexto: detalle.hallazgosTexto ?? null,
+        hallazgosTexto: hallazgosTextoFinal,
         diagnostico: detalle.diagnostico ?? null,
         trabajoRealizado: detalle.trabajoRealizado ?? null,
         recomendaciones: detalle.recomendaciones ?? null,
@@ -216,12 +248,22 @@ async function crearDetallesYHallazgos(
 
     if (detalle.hallazgos?.length) {
       for (const hallazgo of detalle.hallazgos) {
+        const hallazgoCatalogo = await prisma.hallazgoCatalogo.findUnique({
+          where: { id: hallazgo.hallazgoCatalogoId },
+        });
+
         const hallazgoCreado = await prisma.reporteDetalleHallazgo.create({
           data: {
             reporteDetalleMaquinaId: detalleCreado.id,
             hallazgoCatalogoId: hallazgo.hallazgoCatalogoId,
-            codigoHallazgo: hallazgo.codigoHallazgo ?? null,
-            descripcionHallazgo: hallazgo.descripcionHallazgo ?? null,
+            codigoHallazgo:
+              hallazgo.codigoHallazgo ??
+              hallazgoCatalogo?.codigo ??
+              null,
+            descripcionHallazgo:
+              hallazgo.descripcionHallazgo ??
+              hallazgoCatalogo?.descripcion ??
+              null,
           },
           include: {
             hallazgoCatalogo: true,
@@ -322,7 +364,26 @@ async function guardarCierreReporte(
     urlFirmaFinal = firmaGuardada.rutaCompleta;
   }
 
-  const cierreCreado = await prisma.cierreReporte.create({
+  const cierreExistente = await prisma.cierreReporte.findFirst({
+    where: { reporteId },
+  });
+
+  if (cierreExistente) {
+    return prisma.cierreReporte.update({
+      where: { id: cierreExistente.id },
+      data: {
+        recibido: cierre.recibido ?? false,
+        aprobado: cierre.aprobado ?? null,
+        nombreRecibe: cierre.nombreRecibe ?? null,
+        puestoRecibe: cierre.puestoRecibe ?? null,
+        urlFirma: urlFirmaFinal,
+        motivoNoRecepcion: cierre.motivoNoRecepcion ?? null,
+        observaciones: cierre.observaciones ?? null,
+      },
+    });
+  }
+
+  return prisma.cierreReporte.create({
     data: {
       reporteId,
       recibido: cierre.recibido ?? false,
@@ -334,8 +395,6 @@ async function guardarCierreReporte(
       observaciones: cierre.observaciones ?? null,
     },
   });
-
-  return cierreCreado;
 }
 
 function construirPayloadJsonInterno(params: {
@@ -355,7 +414,7 @@ function construirPayloadJsonInterno(params: {
     meta: {
       generadoEn: new Date().toISOString(),
       modulo: "reportes",
-      version: 4,
+      version: 5,
     },
     reporte: {
       id: reporte.id,
@@ -475,6 +534,46 @@ function construirAccionesReporte(reporte: {
   };
 }
 
+function resolverEstadoInicialReporte(data: CrearReporteInput): string {
+  if (data.estado?.trim()) return data.estado.trim();
+  return "generado";
+}
+
+function resolverEstadoDesdeCierre(cierre?: CrearCierreInput | null): string {
+  if (!cierre) return "generado";
+  if (cierre.recibido) return "recibido";
+  if (cierre.motivoNoRecepcion) return "sin_recepcion";
+  return "generado";
+}
+
+async function obtenerReporteCompleto(id: number) {
+  return prisma.reporte.findUnique({
+    where: { id },
+    include: {
+      visita: true,
+      cliente: true,
+      tecnico: true,
+      maquina: true,
+      tipoUnidad: true,
+      procedimiento: true,
+      detallesMaquinas: {
+        include: {
+          maquina: true,
+          tipoUnidad: true,
+          procedimientoCatalogo: true,
+          hallazgos: {
+            include: {
+              hallazgoCatalogo: true,
+            },
+          },
+        },
+      },
+      anexos: true,
+      cierre: true,
+    },
+  });
+}
+
 export async function crearReporte(data: CrearReporteInput) {
   if (!data.visitaId) {
     throw new Error("visitaId es obligatorio.");
@@ -495,6 +594,8 @@ export async function crearReporte(data: CrearReporteInput) {
       ? data.tipoUnidadId
       : maquinaDesdeVisita?.tipoUnidadId ?? null;
 
+  const estadoInicial = resolverEstadoInicialReporte(data);
+
   const reporte = await prisma.reporte.create({
     data: {
       numeroReporte,
@@ -510,7 +611,7 @@ export async function crearReporte(data: CrearReporteInput) {
       psi: data.psi ?? null,
       amperaje: data.amperaje ?? null,
       requiereCotizacion: data.requiereCotizacion ?? false,
-      estado: data.estado ?? "borrador",
+      estado: estadoInicial,
       fechaReporte: normalizarFecha(data.fechaReporte),
       urlPdf: null,
       urlCarpetaDrive: storage.rutas.entregableClienteDir,
@@ -560,6 +661,7 @@ export async function crearReporte(data: CrearReporteInput) {
   const jsonInterno = construirPayloadJsonInterno({
     reporte: {
       ...reporte,
+      estado: estadoInicial,
       urlPdf: pdfGenerado.rutaPdfEntregable,
     },
     detallesMaquinas: detallesCreados,
@@ -573,6 +675,7 @@ export async function crearReporte(data: CrearReporteInput) {
 
   const reporteRespuesta = enriquecerUrlsReporte({
     ...reporte,
+    estado: estadoInicial,
     urlPdf: pdfGenerado.rutaPdfEntregable,
   });
 
@@ -603,98 +706,181 @@ export async function crearReporte(data: CrearReporteInput) {
   };
 }
 
-export async function listarReportes() {
-  const reportes = await prisma.reporte.findMany({
-    orderBy: {
-      id: "desc",
+export async function cerrarReporte(
+  reporteId: number,
+  cierre: CrearCierreInput
+) {
+  const reporteBase = await obtenerReporteCompleto(reporteId);
+
+  if (!reporteBase) {
+    throw new Error("Reporte no encontrado.");
+  }
+
+  const estadoFinal = resolverEstadoDesdeCierre(cierre);
+
+  const cierreGuardado = await guardarCierreReporte(
+    reporteId,
+    reporteBase.numeroReporte,
+    cierre
+  );
+
+  await prisma.reporte.update({
+    where: { id: reporteId },
+    data: {
+      estado: estadoFinal,
     },
-    include: {
-      cliente: {
-        select: {
-          id: true,
-          nombre: true,
-        },
-      },
-      tecnico: {
-        select: {
-          id: true,
-          nombre: true,
-          email: true,
-        },
-      },
-      visita: {
-        select: {
-          id: true,
-          fechaVisita: true,
-          estado: true,
-        },
-      },
-      maquina: {
-        select: {
-          id: true,
-          nombreEquipo: true,
-          modelo: true,
-          serie: true,
-        },
-      },
-      tipoUnidad: {
-        select: {
-          id: true,
-          nombre: true,
-          codigo: true,
-        },
-      },
-      procedimiento: {
-        select: {
-          id: true,
-          nombre: true,
-          codigo: true,
-        },
-      },
-      cierre: true,
+  });
+
+  const reporteActualizado = await obtenerReporteCompleto(reporteId);
+
+  if (!reporteActualizado) {
+    throw new Error("No se pudo recargar el reporte actualizado.");
+  }
+
+  const pdfGenerado = await generarPdfReporteLocal({
+    numeroReporte: reporteActualizado.numeroReporte,
+    reporte: reporteActualizado,
+    detallesMaquinas: reporteActualizado.detallesMaquinas,
+    anexos: reporteActualizado.anexos,
+    cierre: cierreGuardado,
+  });
+
+  await prisma.reporte.update({
+    where: { id: reporteId },
+    data: {
+      estado: estadoFinal,
+      urlPdf: pdfGenerado.rutaPdfEntregable,
     },
+  });
+
+  const reporteFinal = await obtenerReporteCompleto(reporteId);
+
+  if (!reporteFinal) {
+    throw new Error("No se pudo obtener el reporte final.");
+  }
+
+  const reporteConUrls = enriquecerUrlsReporte({
+    ...reporteFinal,
+    urlPdf: pdfGenerado.rutaPdfEntregable,
   });
 
   return {
     ok: true,
-    total: reportes.length,
-    data: reportes.map((reporte) => {
-      const reporteConUrls = enriquecerUrlsReporte(reporte);
-
-      return {
-        ...reporteConUrls,
-        acciones: construirAccionesReporte(reporteConUrls),
-      };
-    }),
+    mensaje: "Cierre guardado correctamente.",
+    data: {
+      ...reporteConUrls,
+      anexos: reporteFinal.anexos.map(enriquecerAnexoConUrlLocal),
+      cierre: enriquecerCierreConUrlLocal(reporteFinal.cierre),
+      acciones: construirAccionesReporte(reporteConUrls),
+    },
   };
 }
 
-export async function obtenerReportePorId(id: number) {
-  const reporte = await prisma.reporte.findUnique({
-    where: { id },
-    include: {
-      visita: true,
-      cliente: true,
-      tecnico: true,
-      maquina: true,
-      tipoUnidad: true,
-      procedimiento: true,
-      detallesMaquinas: {
-        include: {
-          maquina: true,
-          tipoUnidad: true,
-          procedimientoCatalogo: true,
-          hallazgos: {
-            include: {
-              hallazgoCatalogo: true,
-            },
+export async function listarReportes() {
+  try {
+    const reportes = await prisma.reporte.findMany({
+      orderBy: {
+        id: "desc",
+      },
+      include: {
+        cliente: {
+          select: {
+            id: true,
+            nombre: true,
           },
         },
+        tecnico: {
+          select: {
+            id: true,
+            nombre: true,
+            email: true,
+          },
+        },
+        visita: {
+          select: {
+            id: true,
+            fechaVisita: true,
+            estado: true,
+          },
+        },
+        maquina: {
+          select: {
+            id: true,
+            nombreEquipo: true,
+            codigoInterno: true,
+            modelo: true,
+            serie: true,
+            marca: true,
+            area: true,
+          },
+        },
+        tipoUnidad: {
+          select: {
+            id: true,
+            nombre: true,
+            codigo: true,
+          },
+        },
+        procedimiento: {
+          select: {
+            id: true,
+            nombre: true,
+            codigo: true,
+          },
+        },
+        cierre: true,
       },
-      anexos: true,
-      cierre: true,
-    },
-  });
+    });
+
+    return {
+      ok: true,
+      total: reportes.length,
+      data: reportes.map((reporte) => {
+        const reporteConUrls = enriquecerUrlsReporte(reporte);
+
+        return {
+          ...reporteConUrls,
+          acciones: construirAccionesReporte(reporteConUrls),
+        };
+      }),
+    };
+  } catch (error) {
+    console.error('listarReportes fallback:', error);
+
+    const reportesBasicos = await prisma.reporte.findMany({
+      orderBy: {
+        id: "desc",
+      },
+      select: {
+        id: true,
+        numeroReporte: true,
+        estado: true,
+        fechaReporte: true,
+        conclusiones: true,
+        observaciones: true,
+        urlPdf: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      ok: true,
+      total: reportesBasicos.length,
+      data: reportesBasicos.map((reporte) => {
+        const reporteConUrls = enriquecerUrlsReporte(reporte as any);
+
+        return {
+          ...reporteConUrls,
+          acciones: construirAccionesReporte(reporteConUrls as any),
+        };
+      }),
+    };
+  }
+}
+
+export async function obtenerReportePorId(id: number) {
+  const reporte = await obtenerReporteCompleto(id);
 
   if (!reporte) {
     throw new Error("Reporte no encontrado.");
@@ -715,6 +901,7 @@ export async function obtenerReportePorId(id: number) {
 
 export const reportesService = {
   crearReporte,
+  cerrarReporte,
   listarReportes,
   obtenerReportePorId,
   obtenerSiguienteNumeroReporte,
