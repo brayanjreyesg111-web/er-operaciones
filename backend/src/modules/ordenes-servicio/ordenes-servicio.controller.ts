@@ -62,11 +62,16 @@ export async function listarOrdenesServicioHandler(req: Request, res: Response) 
       typeof req.query.clienteId === "string"
         ? Number(req.query.clienteId)
         : undefined;
+    const sinVisita =
+      typeof req.query.sinVisita === "string"
+        ? ["true", "1", "si", "sí", "yes"].includes(req.query.sinVisita.toLowerCase())
+        : undefined;
 
     const ordenes = await listarOrdenesServicio({
       estado,
       texto,
       clienteId,
+      sinVisita,
     });
 
     return res.status(200).json({

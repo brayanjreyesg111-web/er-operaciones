@@ -124,6 +124,7 @@ export async function cerrarReportePosterior(params: {
   const payload =
     cierre.tipoCierre === 'RECIBIDO_EN_SITIO'
       ? {
+          tipoCierre: 'RECIBIDO_EN_SITIO',
           recibido: true,
           aprobado: true,
           nombreRecibe: cierre.nombreRecibe,
@@ -133,15 +134,29 @@ export async function cerrarReportePosterior(params: {
           firmaMimeType: cierre.firmaMimeType || 'image/png',
           firmaBase64: limpiarBase64(cierre.firmaBase64),
         }
-      : {
-          recibido: false,
-          aprobado: false,
-          motivoNoRecepcion: cierre.motivoSinRecepcion,
-          observaciones: cierre.observacionSinRecepcion,
-        }
+      : cierre.tipoCierre === 'RECIBIDO_DIGITAL'
+        ? {
+            tipoCierre: 'RECIBIDO_DIGITAL',
+            recibido: true,
+            aprobado: true,
+            nombreRecibe: cierre.nombreRecibe || 'Recibido digitalmente',
+            puestoRecibe: cierre.cargoRecibe || 'Recepción digital',
+            observaciones: cierre.observacionesRecepcion || 'Reporte recibido y aceptado de forma digital / a distancia.',
+          }
+        : {
+            tipoCierre: 'SIN_RECEPCION',
+            recibido: false,
+            aprobado: false,
+            motivoNoRecepcion: cierre.motivoSinRecepcion,
+            observaciones: cierre.observacionSinRecepcion,
+          }
 
   return await fetchApi<ReporteDetalle>(`${API}/reportes/${reporteId}/cierre`, {
     method: 'POST',
     body: JSON.stringify(payload),
   })
+}
+
+export async function obtenerReportePorId(reporteId: number): Promise<ReporteDetalle> {
+  return await fetchApi<ReporteDetalle>(`${API}/reportes/${reporteId}`)
 }

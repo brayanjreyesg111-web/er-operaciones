@@ -1,0 +1,403 @@
+{
+  "meta": {
+    "generadoEn": "2026-04-24T06:36:12.222Z",
+    "modulo": "reportes",
+    "version": 5
+  },
+  "reporte": {
+    "id": 13,
+    "numeroReporte": "377",
+    "visitaId": 5,
+    "clienteId": 8,
+    "tecnicoId": 3,
+    "maquinaId": 7,
+    "tipoUnidadId": null,
+    "procedimientoId": 13,
+    "tipoReporte": "individual",
+    "conclusiones": "",
+    "observaciones": "Registro de prueba",
+    "psi": "130",
+    "amperaje": "34",
+    "requiereCotizacion": false,
+    "estado": "generado",
+    "fechaReporte": "2026-04-24T06:36:09.182Z",
+    "createdAt": "2026-04-24T06:36:09.186Z",
+    "updatedAt": "2026-04-24T06:36:09.186Z",
+    "urlPdf": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\01_Entregable_Cliente\\Reporte_377.pdf"
+  },
+  "relaciones": {
+    "visita": {
+      "id": 5,
+      "numeroVisita": "VIS-0001",
+      "ordenServicioId": 2,
+      "clienteId": 8,
+      "tecnicoId": 3,
+      "actividadId": null,
+      "tipoVisita": "Revison de la unidad",
+      "motivoVisita": "revision de secador de aire",
+      "resultadoBreve": null,
+      "estado": "PENDIENTE",
+      "motivoEstado": null,
+      "requiereCotizacion": true,
+      "esVisitaLibre": false,
+      "fechaVisita": "2026-05-01T03:51:00.000Z",
+      "horaInicio": null,
+      "horaFin": null,
+      "observaciones": "Revision de la unidad",
+      "createdAt": "2026-04-24T03:52:33.617Z",
+      "updatedAt": "2026-04-24T03:52:33.617Z"
+    },
+    "cliente": {
+      "id": 8,
+      "nombre": "CEMCOOLL",
+      "rtn": "0502198700148866",
+      "contactoNombre": "Bernardo",
+      "telefono": "31445678qq",
+      "correo": "n",
+      "direccion": null,
+      "ubicacion": null,
+      "departamentoId": 6,
+      "ciudadId": 12,
+      "activo": true,
+      "createdAt": "2026-04-14T21:55:59.662Z",
+      "updatedAt": "2026-04-14T21:55:59.662Z"
+    },
+    "tecnico": {
+      "id": 3,
+      "nombre": "Tecnico General",
+      "email": "tecnico@er.local",
+      "passwordHash": "$2b$10$qJk5dBHl2D0RpjShhn9VEeRQ4tcbjmaeUArMw0db/8HleLlyTLVkq",
+      "activo": true,
+      "roleId": 3,
+      "createdAt": "2026-04-15T18:05:25.890Z",
+      "updatedAt": "2026-04-15T18:05:25.890Z"
+    },
+    "maquina": {
+      "id": 7,
+      "clienteId": 8,
+      "tipoUnidadId": 4,
+      "marcaId": 1,
+      "refrigeranteId": 2,
+      "unidadMedidaCargaId": 1,
+      "departamentoId": 6,
+      "ciudadId": 12,
+      "codigoInterno": "CHILLER_LG_ND_123456789_SAN_PEDRO_SULA_SALA_DE_MAQUINAS",
+      "tipoEquipo": "CHILLER",
+      "marca": "LG",
+      "modelo": null,
+      "serie": "123456789",
+      "cargaRefrigeranteCantidad": "9",
+      "direccionExacta": "Desvio a la cafetalera",
+      "area": "Sala de maquinas",
+      "observaciones": null,
+      "activo": true,
+      "createdAt": "2026-04-14T21:58:28.206Z",
+      "updatedAt": "2026-04-14T21:58:28.206Z"
+    },
+    "tipoUnidad": null,
+    "procedimiento": {
+      "id": 13,
+      "codigo": "PROC-003",
+      "nombre": "Revisión de presiones y amperaje",
+      "descripcionCompletaPdf": "Se midieron presiones del sistema y consumo eléctrico del equipo para comparar contra rangos esperados y determinar comportamiento operativo.",
+      "activo": true,
+      "createdAt": "2026-04-14T17:28:08.938Z",
+      "updatedAt": "2026-04-14T17:28:08.938Z"
+    }
+  },
+  "detallesMaquinas": [
+    {
+      "id": 13,
+      "reporteId": 13,
+      "maquinaId": 7,
+      "tipoUnidadId": 4,
+      "procedimientoId": 13,
+      "procedimiento": null,
+      "tituloActividad": "Revisión de presiones y amperaje",
+      "descripcionActividadPdf": "Se midieron presiones del sistema y consumo eléctrico del equipo para comparar contra rangos esperados y determinar comportamiento operativo.",
+      "hallazgosTexto": "H-004: Capacitor fuera de rango | H-005: Terminal floja en contactor | H-006: Protector térmico disparado | H-007: Serpentín con suciedad acumulada | H-009: Ventilador con desgaste en rodamiento | H-008: Vibración excesiva en compresor | H-001: Fuga detectada en línea de succión | H-002: Presión por debajo del rango esperado | H-003: Escarcha anormal en evaporador | H-02: Posible fuga de refrigerante. | H-01: Presión fuera de rango.",
+      "diagnostico": null,
+      "trabajoRealizado": null,
+      "recomendaciones": null,
+      "psi": "130",
+      "amperaje": "34",
+      "observaciones": "Registro de prueba",
+      "createdAt": "2026-04-24T06:36:09.232Z",
+      "updatedAt": "2026-04-24T06:36:09.232Z",
+      "maquina": {
+        "id": 7,
+        "clienteId": 8,
+        "tipoUnidadId": 4,
+        "marcaId": 1,
+        "refrigeranteId": 2,
+        "unidadMedidaCargaId": 1,
+        "departamentoId": 6,
+        "ciudadId": 12,
+        "codigoInterno": "CHILLER_LG_ND_123456789_SAN_PEDRO_SULA_SALA_DE_MAQUINAS",
+        "tipoEquipo": "CHILLER",
+        "marca": "LG",
+        "modelo": null,
+        "serie": "123456789",
+        "cargaRefrigeranteCantidad": "9",
+        "direccionExacta": "Desvio a la cafetalera",
+        "area": "Sala de maquinas",
+        "observaciones": null,
+        "activo": true,
+        "createdAt": "2026-04-14T21:58:28.206Z",
+        "updatedAt": "2026-04-14T21:58:28.206Z"
+      },
+      "tipoUnidad": {
+        "id": 4,
+        "codigo": "TU-004",
+        "nombre": "CHILLER",
+        "descripcion": "Chiller industrial",
+        "activo": true,
+        "createdAt": "2026-04-06T22:06:04.109Z",
+        "updatedAt": "2026-04-06T22:06:04.109Z"
+      },
+      "procedimientoCatalogo": {
+        "id": 13,
+        "codigo": "PROC-003",
+        "nombre": "Revisión de presiones y amperaje",
+        "descripcionCompletaPdf": "Se midieron presiones del sistema y consumo eléctrico del equipo para comparar contra rangos esperados y determinar comportamiento operativo.",
+        "activo": true,
+        "createdAt": "2026-04-14T17:28:08.938Z",
+        "updatedAt": "2026-04-14T17:28:08.938Z"
+      },
+      "hallazgos": [
+        {
+          "id": 93,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 24,
+          "codigoHallazgo": "H-004",
+          "descripcionHallazgo": "Capacitor fuera de rango",
+          "createdAt": "2026-04-24T06:36:09.260Z",
+          "hallazgoCatalogo": {
+            "id": 24,
+            "codigo": "H-004",
+            "categoria": "Eléctrico",
+            "descripcion": "Capacitor fuera de rango",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 94,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 25,
+          "codigoHallazgo": "H-005",
+          "descripcionHallazgo": "Terminal floja en contactor",
+          "createdAt": "2026-04-24T06:36:09.282Z",
+          "hallazgoCatalogo": {
+            "id": 25,
+            "codigo": "H-005",
+            "categoria": "Eléctrico",
+            "descripcion": "Terminal floja en contactor",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 95,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 26,
+          "codigoHallazgo": "H-006",
+          "descripcionHallazgo": "Protector térmico disparado",
+          "createdAt": "2026-04-24T06:36:09.288Z",
+          "hallazgoCatalogo": {
+            "id": 26,
+            "codigo": "H-006",
+            "categoria": "Eléctrico",
+            "descripcion": "Protector térmico disparado",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 96,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 27,
+          "codigoHallazgo": "H-007",
+          "descripcionHallazgo": "Serpentín con suciedad acumulada",
+          "createdAt": "2026-04-24T06:36:09.293Z",
+          "hallazgoCatalogo": {
+            "id": 27,
+            "codigo": "H-007",
+            "categoria": "Mecánico",
+            "descripcion": "Serpentín con suciedad acumulada",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 97,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 29,
+          "codigoHallazgo": "H-009",
+          "descripcionHallazgo": "Ventilador con desgaste en rodamiento",
+          "createdAt": "2026-04-24T06:36:09.299Z",
+          "hallazgoCatalogo": {
+            "id": 29,
+            "codigo": "H-009",
+            "categoria": "Mecánico",
+            "descripcion": "Ventilador con desgaste en rodamiento",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 98,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 28,
+          "codigoHallazgo": "H-008",
+          "descripcionHallazgo": "Vibración excesiva en compresor",
+          "createdAt": "2026-04-24T06:36:09.304Z",
+          "hallazgoCatalogo": {
+            "id": 28,
+            "codigo": "H-008",
+            "categoria": "Mecánico",
+            "descripcion": "Vibración excesiva en compresor",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 99,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 21,
+          "codigoHallazgo": "H-001",
+          "descripcionHallazgo": "Fuga detectada en línea de succión",
+          "createdAt": "2026-04-24T06:36:09.309Z",
+          "hallazgoCatalogo": {
+            "id": 21,
+            "codigo": "H-001",
+            "categoria": "Refrigeración",
+            "descripcion": "Fuga detectada en línea de succión",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 100,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 22,
+          "codigoHallazgo": "H-002",
+          "descripcionHallazgo": "Presión por debajo del rango esperado",
+          "createdAt": "2026-04-24T06:36:09.315Z",
+          "hallazgoCatalogo": {
+            "id": 22,
+            "codigo": "H-002",
+            "categoria": "Refrigeración",
+            "descripcion": "Presión por debajo del rango esperado",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 101,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 23,
+          "codigoHallazgo": "H-003",
+          "descripcionHallazgo": "Escarcha anormal en evaporador",
+          "createdAt": "2026-04-24T06:36:09.319Z",
+          "hallazgoCatalogo": {
+            "id": 23,
+            "codigo": "H-003",
+            "categoria": "Refrigeración",
+            "descripcion": "Escarcha anormal en evaporador",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 102,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 2,
+          "codigoHallazgo": "H-02",
+          "descripcionHallazgo": "Posible fuga de refrigerante.",
+          "createdAt": "2026-04-24T06:36:09.324Z",
+          "hallazgoCatalogo": {
+            "id": 2,
+            "codigo": "H-02",
+            "categoria": "Refrigeración",
+            "descripcion": "Posible fuga de refrigerante.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 103,
+          "reporteDetalleMaquinaId": 13,
+          "hallazgoCatalogoId": 1,
+          "codigoHallazgo": "H-01",
+          "descripcionHallazgo": "Presión fuera de rango.",
+          "createdAt": "2026-04-24T06:36:09.329Z",
+          "hallazgoCatalogo": {
+            "id": 1,
+            "codigo": "H-01",
+            "categoria": "Refrigeración",
+            "descripcion": "Presión fuera de rango.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        }
+      ]
+    }
+  ],
+  "anexos": [
+    {
+      "id": 66,
+      "reporteId": 13,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1777012569335_748854.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\anexos\\1777012569335_748854.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 956398,
+      "createdAt": "2026-04-24T06:36:09.339Z"
+    },
+    {
+      "id": 67,
+      "reporteId": 13,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1777012569354_1363894.jpeg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\anexos\\1777012569354_1363894.jpeg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 3177229,
+      "createdAt": "2026-04-24T06:36:09.356Z"
+    }
+  ],
+  "cierre": null,
+  "pdf": {
+    "rutaPdfInterno": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\pdf\\Reporte_377.pdf",
+    "rutaPdfEntregable": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\01_Entregable_Cliente\\Reporte_377.pdf"
+  },
+  "storage": {
+    "numeroReporte": "377",
+    "nombreCarpetaReporte": "Reporte_377",
+    "rutas": {
+      "baseStorageDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage",
+      "reportesBaseDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes",
+      "reporteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377",
+      "entregableClienteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\01_Entregable_Cliente",
+      "internoDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno",
+      "anexosDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\anexos",
+      "firmasDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\firmas",
+      "pdfDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\pdf",
+      "jsonDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_377\\99_Interno\\json"
+    },
+    "yaExistia": false
+  }
+}

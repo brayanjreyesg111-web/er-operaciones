@@ -212,9 +212,11 @@ export default function CierreReporteForm({ value, onChange }: Props) {
           <strong className="summaryValue">
             {value.tipoCierre === 'RECIBIDO_EN_SITIO'
               ? 'Recibido en sitio'
-              : value.tipoCierre === 'SIN_RECEPCION'
-                ? 'Sin recepción'
-                : 'Pendiente'}
+              : value.tipoCierre === 'RECIBIDO_DIGITAL'
+                ? 'Recibido digitalmente'
+                : value.tipoCierre === 'SIN_RECEPCION'
+                  ? 'Sin recepción'
+                  : 'Pendiente'}
           </strong>
           <p className="cardHint">Selecciona la salida real del trabajo.</p>
         </article>
@@ -262,6 +264,7 @@ export default function CierreReporteForm({ value, onChange }: Props) {
             >
               <option value="">Seleccione...</option>
               <option value="RECIBIDO_EN_SITIO">Recibido en sitio</option>
+              <option value="RECIBIDO_DIGITAL">Recibido digitalmente / a distancia</option>
               <option value="SIN_RECEPCION">Sin recepción</option>
             </select>
           </div>
@@ -336,6 +339,39 @@ export default function CierreReporteForm({ value, onChange }: Props) {
                     {drawing ? 'Firmando...' : firmaLista ? 'Firma lista' : 'Pendiente de firma'}
                   </span>
                 </div>
+              </div>
+            </>
+          )}
+
+
+          {value.tipoCierre === 'RECIBIDO_DIGITAL' && (
+            <>
+              <div className="campo">
+                <label>Nombre de quien confirma</label>
+                <input
+                  value={value.nombreRecibe}
+                  onChange={(e) => actualizar('nombreRecibe', e.target.value)}
+                  placeholder="Nombre del cliente o responsable (opcional)"
+                />
+              </div>
+
+              <div className="campo">
+                <label>Cargo / puesto</label>
+                <input
+                  value={value.cargoRecibe}
+                  onChange={(e) => actualizar('cargoRecibe', e.target.value)}
+                  placeholder="Cargo o puesto (opcional)"
+                />
+              </div>
+
+              <div className="campo campoCompleto">
+                <label>Observación de recepción digital</label>
+                <textarea
+                  rows={3}
+                  value={value.observacionesRecepcion}
+                  onChange={(e) => actualizar('observacionesRecepcion', e.target.value)}
+                  placeholder="Ej. Cliente recibió el reporte por WhatsApp/correo y confirmó conformidad."
+                />
               </div>
             </>
           )}

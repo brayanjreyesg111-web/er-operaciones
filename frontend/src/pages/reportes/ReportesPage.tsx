@@ -9,6 +9,8 @@ function resolverVistaDesdeQuery(value: string | null): VistaActual | undefined 
   if (value === 'cliente') return 'cliente'
   if (value === 'crear') return 'crear'
   if (value === 'maquina') return 'maquina'
+  if (value === 'detalle') return 'detalle'
+  if (value === 'detalle-visita') return 'detalle-visita'
   return undefined
 }
 
@@ -35,25 +37,11 @@ function resolverTitulo(vista: VistaActual) {
   return 'Crear reporte'
 }
 
-function resolverDescripcion(vista: VistaActual, puedeGestionarClientes: boolean) {
-  if (vista === 'cliente') {
-    return 'Alta rápida del cliente desde la vista autorizada del supervisor.'
-  }
-
-  if (vista === 'maquina') {
-    return 'Registro operativo de la máquina ligado al cliente que ya estás trabajando.'
-  }
-
-  return puedeGestionarClientes
-    ? 'Flujo directo para crear reportes y, si hace falta, abrir registros auxiliares desde la supervisión.'
-    : 'Flujo directo para crear reportes con clientes ya existentes, sin botones que desordenen el trabajo técnico.'
-}
-
 export default function ReportesPage() {
   const { logout, user } = useAuth()
   const [searchParams] = useSearchParams()
 
-  const puedeGestionarClientes = user?.role === 'SUPERVISOR'
+  const puedeGestionarClientes = user?.role === 'SUPERVISOR' || user?.role === 'ADMINISTRADOR'
   const vistaQuery = resolverVistaDesdeQuery(searchParams.get('abrir')) || 'crear'
   const vistaInicial = !puedeGestionarClientes && vistaQuery === 'cliente' ? 'crear' : vistaQuery
   const contextoInicial = searchParams.get('context') === 'dashboard' ? 'dashboard' : 'reportes'
@@ -62,6 +50,8 @@ export default function ReportesPage() {
 
   const fromParam = searchParams.get('from')
   const fromSuffix = fromParam ? `&from=${fromParam}` : ''
+  const visitaIdInicial = searchParams.get('visitaId')
+  const reporteIdInicial = searchParams.get('reporteId')
 
   const items = useMemo(() => {
     const baseItems = [
@@ -89,15 +79,12 @@ export default function ReportesPage() {
   }, [fromSuffix, puedeGestionarClientes, rutaMenu, vistaInicial])
 
   const titulo = resolverTitulo(vistaInicial)
-  const descripcion = resolverDescripcion(vistaInicial, puedeGestionarClientes)
 
   return (
     <div className="portalShell roleShell reportesShellV2">
-      <header className="dashboardTopbar dashboardTopbarCompact">
+      <header className="dashboardTopbar dashboardTopbarCompact dashboardTopbarTitleOnly">
         <div>
-          <div className="topbarEyebrow">Portal interno · Flujo operativo</div>
           <h1>{titulo}</h1>
-          <p>{descripcion}</p>
         </div>
 
         <button className="powerLogoutButton" type="button" onClick={logout}>
@@ -113,6 +100,8 @@ export default function ReportesPage() {
           initialVista={vistaInicial}
           initialContext={contextoInicial}
           returnPath={rutaMenu}
+          initialVisitaId={visitaIdInicial}
+          initialReporteId={reporteIdInicial}
         />
       </main>
     </div>

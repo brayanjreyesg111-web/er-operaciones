@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import logoEr from '../../assets/logo_er.png'
-import heroEr from '../../assets/hero.png'
+import SearchableSelect from '../../components/ui/SearchableSelect'
 import {
   crearSolicitudPublica,
   obtenerCiudadesPublicas,
@@ -190,13 +190,12 @@ export default function PublicPortalPage() {
   }
 
   return (
-    <div className="portalPublico portalPublicoV2">
-      <header className="publicHeader publicHeaderV2">
-        <div className="publicBrand publicBrandV2">
+    <div className="portalPublico portalPublicoSinHero">
+      <header className="publicHeader">
+        <div className="publicBrand publicBrandPlain">
           <img src={logoEr} alt="Logo Expertos en Refrigeración" />
           <div>
             <h1>Expertos en Refrigeración</h1>
-            <p>Portal público de presentación, servicios y solicitud técnica.</p>
           </div>
         </div>
 
@@ -209,8 +208,7 @@ export default function PublicPortalPage() {
           ☰
         </button>
 
-        <nav className={`publicNav publicNavV2 ${menuOpen ? 'is-open' : ''}`}>
-          <a href="#inicio">Inicio</a>
+        <nav className={`publicNav ${menuOpen ? 'is-open' : ''}`}>
           <a href="#lineas">Líneas</a>
           <a href="#servicios">Servicios</a>
           <button type="button" onClick={abrirSolicitud}>
@@ -226,29 +224,6 @@ export default function PublicPortalPage() {
       </header>
 
       <main className="publicLanding">
-        <section id="inicio" className="publicHeroHome">
-          <div className="publicHeroTextCard">
-            <span className="heroBadge">Inicio</span>
-            <h2>Expertos en refrigeración</h2>
-            <p>
-              Operación técnica para mantenimiento, diagnóstico, instalación, visitas y soporte
-              documental con imagen empresarial.
-            </p>
-            <div className="heroActions heroActionsStackMobile">
-              <button className="btnPortalPrincipal" type="button" onClick={abrirSolicitud}>
-                Solicitar visita técnica
-              </button>
-              <Link className="btnPortalSecundario" to="/login">
-                Ingresar al portal interno
-              </Link>
-            </div>
-          </div>
-
-          <div className="publicHeroImageCard">
-            <img src={heroEr} alt="Atención técnica de refrigeración" />
-          </div>
-        </section>
-
         <section id="lineas" className="publicSectionBlock">
           <div className="sectionTitleCenter">
             <span className="sectionCaption">Líneas de confort</span>
@@ -268,44 +243,38 @@ export default function PublicPortalPage() {
           </div>
         </section>
 
-        <section id="servicios" className="publicSectionBlock">
-          <div className="sectionTitleCenter">
-            <span className="sectionCaption">Qué hacemos</span>
-            <h3>Servicio para resolver distintos escenarios de climatización</h3>
-          </div>
+        <section id="servicios" className="publicExpandableArea">
+          <details className="publicAccordion">
+            <summary>Servicios</summary>
+            <div className="publicPanel accordionInnerPanel">
+              <div className="sectionTitleCenter">
+                <span className="sectionCaption">Qué hacemos</span>
+                <h3>Servicio para resolver distintos escenarios de climatización</h3>
+              </div>
 
-          <div className="servicesGridV2">
-            {serviciosPrincipales.map((servicio) => (
-              <article key={servicio} className="serviceFeatureCard">
-                <div className="serviceFeatureIcon" aria-hidden="true">
-                  ✦
-                </div>
-                <h4>{servicio}</h4>
-                <p>
-                  Presentación comercial del servicio dentro del portal público, con enfoque limpio,
-                  profesional y adaptado a móvil.
-                </p>
-              </article>
-            ))}
-          </div>
+              <div className="servicesGridV2">
+                {serviciosPrincipales.map((servicio) => (
+                  <article key={servicio} className="serviceFeatureCard">
+                    <div className="serviceFeatureIcon" aria-hidden="true">
+                      ✦
+                    </div>
+                    <h4>{servicio}</h4>
+                    <p>
+                      Presentación comercial del servicio dentro del portal público, con enfoque limpio,
+                      profesional y adaptado a móvil.
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </details>
         </section>
 
         <section className="publicExpandableArea">
           <details id="solicitud-panel" className="publicAccordion" open={solicitudOpen}>
             <summary>Solicitar visita técnica</summary>
             <div className="publicPanel accordionInnerPanel">
-              <div className="sectionHeading">
-                <div>
-                  <span className="heroBadge heroBadgeSmall">Solicitud pública</span>
-                  <h2>Solicitar visita técnica</h2>
-                  <p>
-                    Completa solo los datos necesarios. La solicitud pasará a revisión, coordinación y
-                    asignación dentro del portal privado.
-                  </p>
-                </div>
-              </div>
-
-              <div className="publicFormGrid publicFormGridCompact">
+              <div className="publicFormGrid">
                 <label>
                   Nombre completo *
                   <input
@@ -334,47 +303,39 @@ export default function PublicPortalPage() {
                 </label>
 
                 <label>
-                  Empresa o atención personal
+                  Empresa o área de atención (opcional)
                   <input
                     value={formSolicitud.empresa}
                     onChange={(e) => actualizarCampo('empresa', e.target.value)}
-                    placeholder="Empresa o ‘A título personal’"
+                    placeholder="Ej. empresa, área, departamento o atención personal"
                   />
                 </label>
 
                 <label>
                   Departamento *
-                  <select
+                  <SearchableSelect
+                    id="solicitudDepartamento"
+                    name="departamentoId"
                     value={formSolicitud.departamentoId}
-                    onChange={(e) => actualizarCampo('departamentoId', e.target.value)}
-                  >
-                    <option value="">Seleccione departamento</option>
-                    {departamentos.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.nombre}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Escribe para buscar departamento..."
+                    required
+                    options={departamentos.map((item) => ({ value: item.id, label: item.nombre }))}
+                    onChangeValue={(value) => actualizarCampo('departamentoId', value)}
+                  />
                 </label>
 
                 <label>
                   Ciudad *
-                  <select
+                  <SearchableSelect
+                    id="solicitudCiudad"
+                    name="ciudadId"
                     value={formSolicitud.ciudadId}
-                    onChange={(e) => actualizarCampo('ciudadId', e.target.value)}
+                    placeholder={!formSolicitud.departamentoId ? 'Seleccione primero un departamento' : 'Escribe para buscar ciudad...'}
                     disabled={!formSolicitud.departamentoId}
-                  >
-                    <option value="">
-                      {!formSolicitud.departamentoId
-                        ? 'Seleccione primero un departamento'
-                        : 'Seleccione ciudad'}
-                    </option>
-                    {ciudades.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.nombre}
-                      </option>
-                    ))}
-                  </select>
+                    required
+                    options={ciudades.map((item) => ({ value: item.id, label: item.nombre }))}
+                    onChangeValue={(value) => actualizarCampo('ciudadId', value)}
+                  />
                 </label>
 
                 <label>
@@ -422,7 +383,7 @@ export default function PublicPortalPage() {
 
               <div className="requestSummaryTrigger">
                 <button
-                  className="btnPortalSecundario"
+                  className="btnPortalSecundario btnPortalSecundarioVibrant"
                   type="button"
                   onClick={() => setMostrarResumenSolicitud((prev) => !prev)}
                 >
@@ -447,7 +408,7 @@ export default function PublicPortalPage() {
                       <strong>{formSolicitud.tipoServicio || 'Pendiente'}</strong>
                     </div>
                     <div>
-                      <span>Empresa</span>
+                      <span>Empresa/área</span>
                       <strong>{formSolicitud.empresa || 'A título personal / Pendiente'}</strong>
                     </div>
                   </div>
@@ -457,11 +418,15 @@ export default function PublicPortalPage() {
               {mensajeSolicitud && <div className="mensajeSolicitud">{mensajeSolicitud}</div>}
               {errorSolicitud && <div className="errorBox">{errorSolicitud}</div>}
 
-              <div className="heroActions">
+              <div className="formActionsWide">
                 <button className="btnPortalPrincipal" type="button" onClick={enviarSolicitud} disabled={guardandoSolicitud}>
                   {guardandoSolicitud ? 'Enviando solicitud...' : 'Enviar solicitud'}
                 </button>
-                <button className="btnPortalSecundario" type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <button
+                  className="btnPortalSecundario btnPortalSecundarioVibrant"
+                  type="button"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
                   Volver arriba
                 </button>
               </div>
@@ -472,14 +437,10 @@ export default function PublicPortalPage() {
             <summary>Contacto y canales</summary>
             <div className="publicPanel accordionInnerPanel">
               <div className="sectionTitleCenter sectionTitleCenterLeft">
-                <span className="sectionCaption">Contacto</span>
-                <h3>Canales visibles del portal</h3>
-                <p>
-                  La información de contacto se deja disponible sin recargar la home principal.
-                </p>
+                <h3>Contacto</h3>
               </div>
 
-              <div className="contactGrid contactGridSimple">
+              <div className="contactGrid">
                 <article className="publicCard">
                   <h4>Correo</h4>
                   <p>contacto@eroperaciones.com</p>

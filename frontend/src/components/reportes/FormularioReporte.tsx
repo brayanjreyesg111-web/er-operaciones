@@ -7,6 +7,28 @@ import type {
   TecnicoOption,
 } from '../../types/reportes.types'
 
+type VisitaReporteOption = {
+  id: number
+  numeroVisita?: string | null
+  clienteId: number
+  tecnicoId: number
+  estado?: string | null
+  fechaVisita?: string | null
+  cliente?: { nombre?: string | null } | null
+  tecnico?: { nombre?: string | null } | null
+  maquinas?: Array<{
+    maquinaId?: number
+    maquina?: {
+      id?: number
+      codigoInterno?: string | null
+      marca?: string | null
+      modelo?: string | null
+      serie?: string | null
+      area?: string | null
+    } | null
+  }>
+}
+
 type Props = {
   form: FormReporte
   clientes: ClienteOption[]
@@ -14,6 +36,10 @@ type Props = {
   tecnicos: TecnicoOption[]
   procedimientos: ProcedimientoOption[]
   hallazgosAgrupados: Record<string, HallazgoOption[]>
+  visitasReporte?: VisitaReporteOption[]
+  usuarioActual?: { id?: number; nombre?: string; email?: string | null } | null
+  loadingVisitasReporte?: boolean
+  modoLibreReporte?: boolean
   hallazgosSeleccionados: number[]
   categoriasAbiertas: string[]
   anexos: File[]
@@ -38,6 +64,13 @@ type Props = {
   onGoMenu?: () => void
 }
 
+function textoVisita(visita: VisitaReporteOption) {
+  const numero = visita.numeroVisita || `Visita #${visita.id}`
+  const cliente = visita.cliente?.nombre || `Cliente #${visita.clienteId}`
+  const estado = visita.estado || 'PENDIENTE'
+  return `${numero} · ${cliente} · ${estado}`
+}
+
 function textoMaquina(maq: MaquinaOption) {
   if (maq.codigoInterno && String(maq.codigoInterno).trim()) return maq.codigoInterno
 
@@ -55,6 +88,10 @@ export default function FormularioReporte({
   tecnicos,
   procedimientos,
   hallazgosAgrupados,
+  visitasReporte = [],
+  usuarioActual = null,
+  loadingVisitasReporte = false,
+  modoLibreReporte = false,
   hallazgosSeleccionados,
   categoriasAbiertas,
   anexos,
@@ -76,37 +113,61 @@ export default function FormularioReporte({
   showMenuButton = false,
   onGoMenu,
 }: Props) {
+  const contextoBloqueadoPorVisita = Boolean(form.visitaId && form.visitaId !== 'LIBRE')
+  const visitaSeleccionada = visitasReporte.find((visita) => String(visita.id) === form.visitaId)
+  const tecnicoActualEnLista = tecnicos.some((tecnico) => String(tecnico.id) === String(form.tecnicoId))
+  const tecnicoDelLogin = usuarioActual?.id && String(usuarioActual.id) === String(form.tecnicoId)
+  const tecnicoAsignadoTexto =
+    (tecnicoDelLogin ? usuarioActual?.nombre : '') ||
+    visitaSeleccionada?.tecnico?.nombre ||
+    (form.tecnicoId ? `Usuario #${form.tecnicoId}` : 'Usuario actual')
+  const tecnicoBloqueadoPorLogin = Boolean(form.tecnicoId)
+
   return (
     <section className="panel compactFormPanel compactFormPanelResponsive">
       <div className="bloqueFormulario compactOnlyFormBlock">
         <div className="sectionHeaderSplit">
           <div>
-            <span className="sectionCaption">Flujo operativo</span>
             <h3>1. Contexto del reporte</h3>
           </div>
-          <p className="sectionMiniHelp">
-            El técnico trabaja sobre clientes ya existentes. Si falta uno nuevo, debe solicitarlo al supervisor.
-          </p>
         </div>
 
         <div className="formGrid">
-          <div className="campo">
+          <div className="campo campoCompleto reportVisitSelector">
             <label htmlFor="visitaId">Visita relacionada</label>
-            <input
+            <select
               id="visitaId"
               name="visitaId"
               value={form.visitaId}
               onChange={onChange}
-              placeholder="Ej. 12"
-            />
-            <p className="textoAyuda">
-              Usa la visita ya creada o el correlativo operativo correspondiente.
+              disabled={loadingVisitasReporte}
+            >
+              <option value="">
+                {loadingVisitasReporte ? 'Cargando visitas asignadas...' : 'Seleccione una visita asignada'}
+              </option>
+              <option value="LIBRE">Modo libre / sin visita previa</option>
+              {visitasReporte.map((visita) => (
+                <option key={visita.id} value={visita.id}>
+                  {textoVisita(visita)}
+                </option>
+              ))}
+            </select>
+            <p className="formFieldHint">
+              {modoLibreReporte
+                ? 'Modo libre activo: selecciona cliente y máquina manualmente; el sistema creará la visita libre al guardar el reporte.'
+                : 'El técnico solo debe usar visitas asignadas a su usuario. Usa modo libre solo para emergencias o visitas sin asignación previa.'}
             </p>
           </div>
 
           <div className="campo">
             <label htmlFor="clienteId">Cliente</label>
-            <select id="clienteId" name="clienteId" value={form.clienteId} onChange={onChange}>
+            <select
+              id="clienteId"
+              name="clienteId"
+              value={form.clienteId}
+              onChange={onChange}
+              disabled={contextoBloqueadoPorVisita}
+            >
               <option value="">
                 {loadingClientes ? 'Cargando clientes...' : 'Seleccione cliente'}
               </option>
@@ -124,11 +185,7 @@ export default function FormularioReporte({
               >
                 + Agregar cliente
               </button>
-            ) : (
-              <p className="textoAyuda">
-                Si el cliente no existe en la lista, notifícalo al supervisor antes de continuar.
-              </p>
-            )}
+            ) : null}
           </div>
 
           <div className="campo">
@@ -164,23 +221,31 @@ export default function FormularioReporte({
             >
               + Agregar máquina
             </button>
-            <p className="textoAyuda">
-              {form.clienteId
-                ? 'Si la máquina aún no existe, puedes crearla y volver al reporte con el cliente seleccionado.'
-                : 'Si todavía no elegiste cliente, este botón abrirá el formulario de máquina con selector de cliente.'}
-            </p>
           </div>
 
           <div className="campo">
-            <label htmlFor="tecnicoId">Técnico</label>
-            <select id="tecnicoId" name="tecnicoId" value={form.tecnicoId} onChange={onChange}>
-              <option value="">Seleccione técnico</option>
+            <label htmlFor="tecnicoId">Técnico / usuario que genera el reporte</label>
+            <select
+              id="tecnicoId"
+              name="tecnicoId"
+              value={form.tecnicoId}
+              onChange={onChange}
+              disabled={tecnicoBloqueadoPorLogin}
+            >
+              <option value="">Usuario no identificado</option>
+              {form.tecnicoId && (!tecnicoActualEnLista || tecnicoDelLogin) && (
+                <option value={form.tecnicoId}>{tecnicoAsignadoTexto}</option>
+              )}
               {tecnicos.map((tecnico) => (
                 <option key={tecnico.id} value={tecnico.id}>
                   {tecnico.nombre}
                 </option>
               ))}
             </select>
+            <p className="formFieldHint">
+              Este dato se toma del login actual y queda bloqueado para mantener la trazabilidad del reporte.
+              {contextoBloqueadoPorVisita ? ' La visita solo aporta cliente y máquina relacionada.' : ''}
+            </p>
           </div>
         </div>
       </div>
@@ -188,7 +253,6 @@ export default function FormularioReporte({
       <div className="bloqueFormulario compactOnlyFormBlock">
         <div className="sectionHeaderSplit">
           <div>
-            <span className="sectionCaption">Datos técnicos</span>
             <h3>2. Actividad y parámetros</h3>
           </div>
         </div>
@@ -238,46 +302,65 @@ export default function FormularioReporte({
         </div>
       </div>
 
-      <div className="bloqueFormulario compactOnlyFormBlock">
-        <div className="sectionHeaderSplit">
+      <div className="bloqueFormulario compactOnlyFormBlock reportStepBlock">
+        <div className="sectionHeaderSplit reportStepHeader">
           <div>
             <span className="sectionCaption">Checklist técnico</span>
             <h3>3. Hallazgos</h3>
+            <p className="sectionMiniHelp">
+              Abre una categoría y marca los hallazgos que aplican al trabajo realizado.
+            </p>
           </div>
+          <span className="hallazgoCountPill">
+            {hallazgosSeleccionados.length} seleccionado(s)
+          </span>
         </div>
 
         {Object.keys(hallazgosAgrupados).length === 0 ? (
-          <p className="textoAyuda">No hay hallazgos disponibles.</p>
+          <p className="textoAyuda emptyBlock">No hay hallazgos disponibles.</p>
         ) : (
           <div className="hallazgosWrap">
             {Object.entries(hallazgosAgrupados).map(([categoria, hallazgos]) => {
               const abierta = categoriasAbiertas.includes(categoria)
+              const totalSeleccionados = hallazgos.filter((hallazgo) =>
+                hallazgosSeleccionados.includes(hallazgo.id)
+              ).length
 
               return (
                 <div key={categoria} className="hallazgoCategoriaCard">
                   <button
                     type="button"
-                    className="hallazgoCategoriaHeader"
+                    className={`hallazgoCategoriaHeader ${abierta ? 'isOpen' : ''}`}
                     onClick={() => onToggleCategoria(categoria)}
+                    title={abierta ? 'Cerrar categoría de hallazgos' : 'Abrir categoría de hallazgos'}
                   >
-                    <span>{categoria}</span>
-                    <span>{abierta ? '−' : '+'}</span>
+                    <span className="hallazgoCategoriaTitulo">{categoria}</span>
+                    <span className="hallazgoCategoriaMeta">
+                      {totalSeleccionados}/{hallazgos.length} · {abierta ? 'Cerrar' : 'Abrir'}
+                    </span>
                   </button>
 
                   {abierta && (
                     <div className="hallazgoCategoriaBody">
-                      {hallazgos.map((hallazgo) => (
-                        <label key={hallazgo.id} className="hallazgoCheck">
-                          <input
-                            type="checkbox"
-                            checked={hallazgosSeleccionados.includes(hallazgo.id)}
-                            onChange={() => onToggleHallazgo(hallazgo.id)}
-                          />
-                          <span>
-                            <strong>{hallazgo.codigo}</strong> - {hallazgo.descripcion}
-                          </span>
-                        </label>
-                      ))}
+                      {hallazgos.map((hallazgo) => {
+                        const activo = hallazgosSeleccionados.includes(hallazgo.id)
+
+                        return (
+                          <label
+                            key={hallazgo.id}
+                            className={activo ? 'hallazgoCheck hallazgoCheckActive' : 'hallazgoCheck'}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={activo}
+                              onChange={() => onToggleHallazgo(hallazgo.id)}
+                            />
+                            <span>
+                              <strong>{hallazgo.codigo}</strong> - {hallazgo.descripcion}
+                            </span>
+                          </label>
+                        )
+                      })}
                     </div>
                   )}
                 </div>
@@ -291,13 +374,25 @@ export default function FormularioReporte({
         <div className="sectionHeaderSplit">
           <div>
             <span className="sectionCaption">Evidencia</span>
-            <h3>4. Observaciones y anexos</h3>
+            <h3>4. Observaciones, conclusiones y anexos</h3>
           </div>
         </div>
 
         <div className="formGrid">
           <div className="campo campoCompleto">
-            <label htmlFor="observaciones">Observaciones</label>
+            <label htmlFor="conclusiones">Conclusiones técnicas</label>
+            <textarea
+              id="conclusiones"
+              name="conclusiones"
+              value={form.conclusiones}
+              onChange={onChange}
+              rows={4}
+              placeholder="Escribe la conclusión técnica del trabajo realizado, estado final y recomendaciones principales"
+            />
+          </div>
+
+          <div className="campo campoCompleto">
+            <label htmlFor="observaciones">Observaciones del servicio</label>
             <textarea
               id="observaciones"
               name="observaciones"
@@ -308,12 +403,22 @@ export default function FormularioReporte({
             />
           </div>
 
-          <div className="campo campoCompleto">
+          <div className="campo campoCompleto evidenceFileField">
             <label htmlFor="anexos">Anexos</label>
-            <input id="anexos" type="file" multiple onChange={onChangeAnexos} />
-            <p className="textoAyuda">
-              {anexos.length ? `${anexos.length} archivo(s) seleccionados.` : 'Puedes adjuntar fotos o documentos de apoyo.'}
-            </p>
+            <div className="fileUploadBox">
+              <input
+                id="anexos"
+                className="fileUploadInput"
+                type="file"
+                multiple
+                onChange={onChangeAnexos}
+              />
+              <p className="fileUploadHint">
+                {anexos.length
+                  ? `${anexos.length} archivo(s) seleccionados.`
+                  : 'Puedes adjuntar fotos o documentos de apoyo.'}
+              </p>
+            </div>
           </div>
         </div>
       </div>

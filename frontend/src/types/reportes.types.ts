@@ -1,9 +1,12 @@
-export type VistaActual = 'inicio' | 'crear' | 'detalle' | 'cliente' | 'maquina'
+export type VistaActual = 'inicio' | 'crear' | 'detalle' | 'cliente' | 'maquina' | 'detalle-visita'
 
 export type TecnicoOption = {
   id: number
   nombre: string
   email?: string | null
+  role?: string | null
+  roleLabel?: string | null
+  label?: string | null
 }
 
 export type ProcedimientoOption = {
@@ -105,7 +108,7 @@ export type ReporteResponse = {
 export type ReporteDetalle = ReporteResponse['data']
 
 export type CierreReporteFormState = {
-  tipoCierre: '' | 'RECIBIDO_EN_SITIO' | 'SIN_RECEPCION'
+  tipoCierre: '' | 'RECIBIDO_EN_SITIO' | 'RECIBIDO_DIGITAL' | 'SIN_RECEPCION'
   nombreRecibe: string
   cargoRecibe: string
   observacionesRecepcion: string

@@ -3,10 +3,24 @@ const API = 'http://localhost:3001/api'
 export type DashboardCliente = {
   id: number
   nombre: string
+  rtn?: string | null
+  contactoNombre?: string | null
+  telefono?: string | null
+  correo?: string | null
+  direccion?: string | null
+  ubicacion?: string | null
+  departamentoId?: number | null
+  ciudadId?: number | null
+  departamento?: { id?: number; nombre?: string } | null
+  ciudad?: { id?: number; nombre?: string } | null
 }
 
 export type DashboardSolicitud = {
   id: number
+  clienteId?: number | null
+  departamentoId?: number | null
+  ciudadId?: number | null
+  direccionExacta?: string | null
   estado?: string | null
   nombreSolicitante: string
   telefono?: string | null
@@ -28,10 +42,12 @@ export type DashboardVisita = {
   fechaVisita?: string
   tipoVisita?: string | null
   motivoVisita?: string | null
+  observaciones?: string | null
   requiereCotizacion?: boolean
   esVisitaLibre?: boolean
-  cliente?: { id?: number; nombre?: string } | null
+  cliente?: { id?: number; nombre?: string; telefono?: string | null; correo?: string | null; direccion?: string | null; ubicacion?: string | null; departamento?: { nombre?: string } | null; ciudad?: { nombre?: string } | null } | null
   tecnico?: { id?: number; nombre?: string; email?: string } | null
+  ordenServicio?: { id?: number; numeroOrden?: string | null; prioridad?: string | null; estado?: string | null; tipoSolicitud?: string | null; descripcionProblema?: string | null; ubicacionServicio?: string | null; contactoNombre?: string | null; telefonoContacto?: string | null; correoContacto?: string | null } | null
   actividad?: {
     id?: number
     codigoActividad?: string | null
@@ -48,6 +64,13 @@ export type DashboardVisita = {
       modelo?: string | null
       serie?: string | null
       area?: string | null
+      direccionExacta?: string | null
+      tipoEquipo?: string | null
+      tipoUnidad?: { id?: number; nombre?: string } | null
+      marcaCatalogo?: { id?: number; nombre?: string } | null
+      refrigeranteCatalogo?: { id?: number; codigo?: string | null; nombre?: string } | null
+      departamento?: { id?: number; nombre?: string } | null
+      ciudad?: { id?: number; nombre?: string } | null
     } | null
   }>
   asignados?: Array<{
@@ -60,6 +83,45 @@ export type DashboardVisita = {
     numeroReporte?: string | null
     estado?: string | null
     fechaReporte?: string
+  }>
+}
+
+export type DashboardActividad = {
+  id: number
+  codigoActividad: string
+  titulo: string
+  descripcion?: string | null
+  categoriaActividad?: string | null
+  tipoOrigen?: string | null
+  prioridad?: string | null
+  estado?: string | null
+  fechaProgramada?: string | null
+  progresoPorcentaje?: number
+  requiereReporte?: boolean
+  requiereVisita?: boolean
+  cliente?: { id?: number; nombre?: string } | null
+  ordenServicio?: { id?: number; numeroOrden?: string | null } | null
+  solicitud?: { id?: number; nombreSolicitante?: string | null; tipoServicio?: string | null } | null
+  asignados?: Array<{
+    id?: number
+    usuarioId?: number
+    usuario?: { id?: number; nombre?: string; email?: string } | null
+  }>
+  pasos?: Array<{
+    id: number
+    orden: number
+    tituloPaso: string
+    descripcionPaso?: string | null
+    estadoPaso?: string | null
+    porcentajePaso?: number
+  }>
+  mensajes?: Array<{
+    id: number
+    asunto?: string | null
+    mensaje: string
+    prioridad?: string | null
+    createdAt?: string
+    usuario?: { id?: number; nombre?: string; email?: string } | null
   }>
 }
 
@@ -98,6 +160,7 @@ export type DashboardBaseData = {
   clientes: DashboardCliente[]
   solicitudes: DashboardSolicitud[]
   visitas: DashboardVisita[]
+  actividades: DashboardActividad[]
   reportes: DashboardReporte[]
 }
 
@@ -124,6 +187,7 @@ export type DashboardSupervisorData = DashboardBaseData & {
 export type DashboardTecnicoData = DashboardBaseData & {
   metrics: DashboardMetric[]
   misVisitas: DashboardVisita[]
+  misActividades: DashboardActividad[]
   misReportes: DashboardReporte[]
 }
 
@@ -161,6 +225,10 @@ async function fetchSafe<T>(url: string, fallback: T): Promise<T> {
   }
 }
 
+function asegurarArray<T>(valor: unknown): T[] {
+  return Array.isArray(valor) ? (valor as T[]) : []
+}
+
 function normalizarEstado(valor?: string | null) {
   return String(valor || '').trim().toUpperCase()
 }
@@ -191,33 +259,61 @@ function solicitudRequiereGestion(solicitud: DashboardSolicitud) {
 }
 
 function reporteSinCierre(reporte: DashboardReporte) {
+  const estado = normalizarEstado(reporte.estado)
+  if (['CERRADO', 'CERRADA', 'RECIBIDO', 'RECIBIDO_EN_SITIO', 'RECIBIDO_DIGITAL', 'SIN_RECEPCION'].includes(estado)) return false
   return !reporte.cierre?.fechaCierre && !reporte.cierre?.nombreRecibe && !reporte.cierre?.motivoNoRecepcion
 }
 
 function visitaPerteneceATecnico(visita: DashboardVisita, tecnicoId: number) {
-  if (visita.tecnico?.id === tecnicoId) return true
+  const id = Number(tecnicoId)
+  if (!id) return false
+  if (Number(visita.tecnico?.id) === id) return true
 
-  return (visita.asignados || []).some((asignado) => asignado.usuario?.id === tecnicoId)
+  return (visita.asignados || []).some((asignado) =>
+    Number(asignado.usuario?.id) === id
+  )
 }
 
 function reportePerteneceATecnico(reporte: DashboardReporte, tecnicoId: number) {
-  return reporte.tecnico?.id === tecnicoId
+  const id = Number(tecnicoId)
+  if (!id) return false
+  return Number(reporte.tecnico?.id) === id
+}
+
+function actividadSigueActiva(actividad: DashboardActividad) {
+  const estado = normalizarEstado(actividad.estado)
+  return !['COMPLETADA', 'FINALIZADA', 'CERRADA', 'CANCELADA'].includes(estado)
+}
+
+function actividadPerteneceATecnico(actividad: DashboardActividad, tecnicoId: number) {
+  const id = Number(tecnicoId)
+  if (!id) return false
+  return (actividad.asignados || []).some((asignado) =>
+    Number(asignado.usuario?.id) === id || Number(asignado.usuarioId) === id
+  )
 }
 
 export async function obtenerDashboardBaseData(): Promise<DashboardBaseData> {
-  const [clientes, solicitudes, visitas, reportes] = await Promise.all([
+  const [clientes, solicitudes, visitas, actividades, reportes] = await Promise.all([
     fetchSafe<DashboardCliente[]>(`${API}/clientes`, []),
     fetchSafe<DashboardSolicitud[]>(`${API}/solicitudes-publicas`, []),
     fetchSafe<DashboardVisita[]>(`${API}/visitas`, []),
+    fetchSafe<DashboardActividad[]>(`${API}/actividades`, []),
     fetchSafe<DashboardReporte[]>(`${API}/reportes`, []),
   ])
 
-  return { clientes, solicitudes, visitas, reportes }
+  return {
+    clientes: asegurarArray<DashboardCliente>(clientes),
+    solicitudes: asegurarArray<DashboardSolicitud>(solicitudes),
+    visitas: asegurarArray<DashboardVisita>(visitas),
+    actividades: asegurarArray<DashboardActividad>(actividades),
+    reportes: asegurarArray<DashboardReporte>(reportes),
+  }
 }
 
 export function construirDashboardAdmin(base: DashboardBaseData): DashboardAdminData {
-  const solicitudesRecientes = ordenarDescPorFecha(base.solicitudes, (item) => item.createdAt).slice(0, 5)
-  const visitasRecientes = ordenarDescPorFecha(base.visitas, (item) => item.fechaVisita).slice(0, 5)
+  const solicitudesRecientes = ordenarDescPorFecha(base.solicitudes.filter(solicitudRequiereGestion), (item) => item.createdAt).slice(0, 8)
+  const visitasRecientes = ordenarDescPorFecha(base.visitas.filter(visitaSigueActiva), (item) => item.fechaVisita).slice(0, 8)
   const reportesRecientes = ordenarDescPorFecha(base.reportes, (item) => item.fechaReporte).slice(0, 5)
 
   const metrics: DashboardMetric[] = [
@@ -232,14 +328,14 @@ export function construirDashboardAdmin(base: DashboardBaseData): DashboardAdmin
       hint: 'Entradas nuevas del portal público pendientes de gestión.',
     },
     {
-      label: 'Visitas abiertas',
-      value: String(base.visitas.filter(visitaSigueActiva).length),
+      label: 'Visitas / actividades abiertas',
+      value: String(base.visitas.filter(visitaSigueActiva).length + base.actividades.filter(actividadSigueActiva).length),
       hint: 'Visitas todavía no finalizadas o no atendidas por completo.',
     },
     {
-      label: 'Reportes emitidos',
-      value: String(base.reportes.length),
-      hint: 'Cantidad total visible en la base actual.',
+      label: 'Reportes sin cierre',
+      value: String(base.reportes.filter(reporteSinCierre).length),
+      hint: 'Documentos emitidos que todavía requieren cierre o recepción.',
     },
   ]
 
@@ -305,14 +401,29 @@ export function construirDashboardTecnico(
   tecnicoId: number
 ): DashboardTecnicoData {
   const misVisitas = ordenarDescPorFecha(
-    base.visitas.filter((visita) => visitaPerteneceATecnico(visita, tecnicoId)),
+    base.visitas.filter((visita) => visitaPerteneceATecnico(visita, tecnicoId) && visitaSigueActiva(visita)),
     (item) => item.fechaVisita
-  ).slice(0, 6)
+  ).slice(0, 10)
+
+  const misActividades = ordenarDescPorFecha(
+    base.actividades.filter((actividad) => actividadPerteneceATecnico(actividad, tecnicoId) && actividadSigueActiva(actividad)),
+    (item) => item.fechaProgramada || item.mensajes?.[0]?.createdAt
+  ).slice(0, 8)
+
+  const misVisitaIds = new Set(
+    base.visitas
+      .filter((visita) => visitaPerteneceATecnico(visita, tecnicoId))
+      .map((visita) => Number(visita.id))
+  )
+
+  const reporteEsDelTecnico = (reporte: DashboardReporte) =>
+    reportePerteneceATecnico(reporte, tecnicoId) ||
+    (reporte.visita?.id ? misVisitaIds.has(Number(reporte.visita.id)) : false)
 
   const misReportes = ordenarDescPorFecha(
-    base.reportes.filter((reporte) => reportePerteneceATecnico(reporte, tecnicoId)),
+    base.reportes.filter(reporteEsDelTecnico),
     (item) => item.fechaReporte
-  ).slice(0, 6)
+  ).slice(0, 8)
 
   const metrics: DashboardMetric[] = [
     {
@@ -321,21 +432,21 @@ export function construirDashboardTecnico(
       hint: 'Visitas asignadas o bajo tu responsabilidad.',
     },
     {
-      label: 'Visitas de hoy',
-      value: String(misVisitas.filter((item) => fechaEsHoy(item.fechaVisita)).length),
-      hint: 'Trabajo previsto o realizado hoy.',
+      label: 'Actividades internas',
+      value: String(misActividades.filter(actividadSigueActiva).length),
+      hint: 'Tareas de taller, materiales o apoyo operativo pendientes.',
     },
     {
-      label: 'Mis reportes',
-      value: String(base.reportes.filter((reporte) => reportePerteneceATecnico(reporte, tecnicoId)).length),
-      hint: 'Reportes generados por tu usuario actual.',
+      label: 'Reportes sin cierre',
+      value: String(base.reportes.filter((reporte) => reporteEsDelTecnico(reporte) && reporteSinCierre(reporte)).length),
+      hint: 'Reportes generados por tu usuario que aún requieren cierre.',
     },
     {
       label: 'Reportes con cierre',
       value: String(
         base.reportes.filter(
           (reporte) =>
-            reportePerteneceATecnico(reporte, tecnicoId) && !reporteSinCierre(reporte)
+            reporteEsDelTecnico(reporte) && !reporteSinCierre(reporte)
         ).length
       ),
       hint: 'Reportes que ya tienen recibido o motivo de no recepción.',
@@ -346,6 +457,7 @@ export function construirDashboardTecnico(
     ...base,
     metrics,
     misVisitas,
+    misActividades,
     misReportes,
   }
 }

@@ -1,5 +1,32 @@
 import type { Request, Response } from "express";
-import { crearMaquina, obtenerMaquinaPorId } from "./maquinas.service";
+import { crearMaquina, listarMaquinas, obtenerMaquinaPorId } from "./maquinas.service";
+
+export async function listarMaquinasController(req: Request, res: Response) {
+  try {
+    const clienteId = req.query.clienteId ? Number(req.query.clienteId) : undefined;
+
+    const data = await listarMaquinas({
+      clienteId:
+        clienteId && Number.isInteger(clienteId) && clienteId > 0 ? clienteId : undefined,
+    });
+
+    return res.json({
+      ok: true,
+      mensaje: "Máquinas obtenidas correctamente.",
+      total: data.length,
+      data,
+    });
+  } catch (error: unknown) {
+    console.error("Error listando máquinas:", error);
+
+    const mensaje = error instanceof Error ? error.message : "No se pudieron listar las máquinas.";
+
+    return res.status(500).json({
+      ok: false,
+      mensaje,
+    });
+  }
+}
 
 export async function crearMaquinaController(req: Request, res: Response) {
   try {
@@ -71,13 +98,8 @@ export async function crearMaquinaController(req: Request, res: Response) {
           ? Number(unidadMedidaCargaId)
           : undefined,
       departamentoId:
-        departamentoId && Number(departamentoId) > 0
-          ? Number(departamentoId)
-          : undefined,
-      ciudadId:
-        ciudadId && Number(ciudadId) > 0
-          ? Number(ciudadId)
-          : undefined,
+        departamentoId && Number(departamentoId) > 0 ? Number(departamentoId) : undefined,
+      ciudadId: ciudadId && Number(ciudadId) > 0 ? Number(ciudadId) : undefined,
       modelo: modelo ? String(modelo) : undefined,
       serie: serie ? String(serie) : undefined,
       cargaRefrigeranteCantidad:
@@ -99,8 +121,7 @@ export async function crearMaquinaController(req: Request, res: Response) {
   } catch (error: unknown) {
     console.error("Error creando máquina:", error);
 
-    const mensaje =
-      error instanceof Error ? error.message : "No se pudo crear la máquina.";
+    const mensaje = error instanceof Error ? error.message : "No se pudo crear la máquina.";
 
     return res.status(500).json({
       ok: false,
@@ -109,10 +130,7 @@ export async function crearMaquinaController(req: Request, res: Response) {
   }
 }
 
-export async function obtenerMaquinaPorIdController(
-  req: Request,
-  res: Response
-) {
+export async function obtenerMaquinaPorIdController(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
 
@@ -139,8 +157,7 @@ export async function obtenerMaquinaPorIdController(
   } catch (error: unknown) {
     console.error("Error obteniendo máquina por id:", error);
 
-    const mensaje =
-      error instanceof Error ? error.message : "No se pudo obtener la máquina.";
+    const mensaje = error instanceof Error ? error.message : "No se pudo obtener la máquina.";
 
     return res.status(500).json({
       ok: false,

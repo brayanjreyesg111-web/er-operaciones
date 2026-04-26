@@ -7,6 +7,23 @@ export type CatalogoUbicacionItem = {
   departamentoId?: number;
 };
 
+export type SolicitudPublica = {
+  id: number
+  clienteId?: number | null
+  nombreSolicitante: string
+  telefono?: string | null
+  correo?: string | null
+  empresa?: string | null
+  departamentoId?: number | null
+  ciudadId?: number | null
+  direccionExacta?: string | null
+  tipoServicio?: string | null
+  descripcion?: string | null
+  estado?: string | null
+  fechaDeseada?: string | null
+  createdAt?: string
+}
+
 export type CrearSolicitudPublicaPayload = {
   nombreSolicitante: string;
   telefono: string;
@@ -62,4 +79,49 @@ export async function crearSolicitudPublica(payload: CrearSolicitudPublicaPayloa
   }
 
   return json.data;
+}
+
+
+export async function actualizarEstadoSolicitudPublica(
+  solicitudId: number,
+  payload: { estado: string; motivoEstado?: string }
+) {
+  const res = await fetch(`${API}/solicitudes-publicas/${solicitudId}/estado`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const raw = await res.text()
+  const json = raw ? JSON.parse(raw) : {}
+
+  if (!res.ok || !json?.ok) {
+    throw new Error(json?.mensaje || `Error HTTP ${res.status}`)
+  }
+
+  return json.data
+}
+
+
+export async function listarSolicitudesPublicas(filtros?: { estado?: string; pendientes?: boolean }): Promise<SolicitudPublica[]> {
+  const params = new URLSearchParams()
+  if (filtros?.estado) params.set('estado', filtros.estado)
+  if (filtros?.pendientes !== undefined) params.set('pendientes', String(filtros.pendientes))
+
+  const query = params.toString()
+  const res = await fetch(`${API}/solicitudes-publicas${query ? `?${query}` : ''}`, {
+    headers: { Accept: 'application/json' },
+  })
+
+  const raw = await res.text()
+  const json = raw ? JSON.parse(raw) : {}
+
+  if (!res.ok || !json?.ok) {
+    throw new Error(json?.mensaje || `Error HTTP ${res.status}`)
+  }
+
+  return json.data || []
 }

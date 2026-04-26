@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './App.css'
 import logoEr from './assets/logo_er.png'
@@ -23,7 +23,13 @@ import {
   obtenerUnidadesMedidaCarga,
 } from './services/catalogos.service'
 import { crearMaquina } from './services/maquinas.service'
-import { cerrarReportePosterior, crearReporteDesdeFormulario } from './services/reportes.service'
+import { cerrarReportePosterior, crearReporteDesdeFormulario, obtenerReportePorId } from './services/reportes.service'
+import {
+  asociarMaquinasAVisita,
+  crearVisita,
+  obtenerVisitas,
+  type VisitaOperativa,
+} from './services/visitas.service'
 
 import type { CatalogoItem } from './types/catalogos.types'
 import type { ClienteOption, FormCliente, MaquinaOption } from './types/clientes.types'
@@ -55,6 +61,8 @@ type Props = {
   initialVista?: VistaActual
   initialContext?: OpenContext
   returnPath?: string
+  initialVisitaId?: string | null
+  initialReporteId?: string | null
 }
 
 const NOTICE_INICIAL: NoticeState = {
@@ -72,11 +80,70 @@ function resolverRutaDashboardPorRol(role?: string) {
   return '/portal/tecnico'
 }
 
+function obtenerMaquinaPrincipalVisita(visita: VisitaOperativa) {
+  return visita.maquinas?.[0]?.maquina || null
+}
+
+function obtenerTecnicoPrincipalVisita(visita: VisitaOperativa, fallback?: string | number | null) {
+  const tecnicoDirecto = visita.tecnicoId || visita.tecnico?.id
+  const tecnicoAsignado = visita.asignados?.find((asignado) =>
+    String(asignado.rolEnVisita || '').toUpperCase().includes('RESPONSABLE')
+  )?.usuario?.id || visita.asignados?.[0]?.usuario?.id || visita.asignados?.[0]?.usuarioId
+
+  return String(tecnicoDirecto || tecnicoAsignado || fallback || '')
+}
+
+function obtenerUsuarioActualId(user?: { id?: number | string | null } | null) {
+  return user?.id ? String(user.id) : ''
+}
+
+type VisitaDetalleOperativa = VisitaOperativa & {
+  cliente?: {
+    id?: number
+    nombre?: string | null
+    telefono?: string | null
+    correo?: string | null
+    direccion?: string | null
+    ubicacion?: string | null
+  } | null
+  ordenServicio?: {
+    id?: number
+    numeroOrden?: string | null
+    contactoNombre?: string | null
+    telefonoContacto?: string | null
+    correoContacto?: string | null
+    ubicacionServicio?: string | null
+    tipoSolicitud?: string | null
+    descripcionProblema?: string | null
+  } | null
+  maquinas?: Array<{
+    id?: number
+    maquinaId?: number
+    maquina?: {
+      id?: number
+      codigoInterno?: string | null
+      marca?: string | null
+      modelo?: string | null
+      serie?: string | null
+      area?: string | null
+      direccionExacta?: string | null
+    } | null
+  }>
+  reportes?: Array<{
+    id: number
+    numeroReporte?: string | null
+    estado?: string | null
+    fechaReporte?: string | null
+  }>
+}
+
 export default function PortalTrabajoActual({
   modoDirecto = false,
   initialVista,
   initialContext = 'reportes',
   returnPath,
+  initialVisitaId,
+  initialReporteId,
 }: Props) {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -116,6 +183,12 @@ export default function PortalTrabajoActual({
   const [procedimientos, setProcedimientos] = useState<ProcedimientoOption[]>([])
   const [hallazgosCatalogo, setHallazgosCatalogo] = useState<HallazgoOption[]>([])
   const [loadingCatalogosReporte, setLoadingCatalogosReporte] = useState(false)
+  const [visitasReporte, setVisitasReporte] = useState<VisitaOperativa[]>([])
+  const [visitaDetalle, setVisitaDetalle] = useState<VisitaOperativa | null>(null)
+  const visitasReporteRef = useRef<VisitaOperativa[]>([])
+  const [loadingVisitasReporte, setLoadingVisitasReporte] = useState(false)
+  const [modoLibreReporte, setModoLibreReporte] = useState(false)
+  const visitaLibreTemporalRef = useRef<{ key: string; visitaId: string } | null>(null)
 
   const [clienteContexto, setClienteContexto] = useState<OpenContext>(
     initialVista === 'cliente' ? initialContext : 'reportes'
@@ -126,12 +199,40 @@ export default function PortalTrabajoActual({
 
   const dashboardPath = returnPath || resolverRutaDashboardPorRol(user?.role)
 
+  const mostrarAviso = useCallback(
+    (tone: NoticeState['tone'], title: string, message: string) => {
+      setNotice({ open: true, tone, title, message })
+    },
+    []
+  )
+
+  const cerrarAviso = useCallback(() => setNotice(NOTICE_INICIAL), [])
+
   useEffect(() => {
     if (!initialVista) return
     setVista(initialVista)
     if (initialVista === 'cliente') setClienteContexto(initialContext)
     if (initialVista === 'maquina') setMaquinaContexto(initialContext)
   }, [initialVista, initialContext])
+
+  useEffect(() => {
+    async function cargarReporteInicial() {
+      const id = Number(initialReporteId || 0)
+      if (!id || Number.isNaN(id)) return
+
+      try {
+        const data = await obtenerReportePorId(id)
+        setReporte(data)
+        setVista('detalle')
+        setMostrarFormularioCierre(initialVista === 'detalle')
+      } catch (err) {
+        console.error(err)
+        mostrarAviso('error', 'Reporte', 'No se pudo cargar el reporte indicado para cierre o detalle.')
+      }
+    }
+
+    void cargarReporteInicial()
+  }, [initialReporteId, initialVista, mostrarAviso])
 
   const detalle = useMemo(() => reporte?.detallesMaquinas?.[0], [reporte])
 
@@ -147,20 +248,13 @@ export default function PortalTrabajoActual({
     return grupos
   }, [hallazgosCatalogo])
 
+  const esTecnico = user?.role === 'TECNICO'
+
   const clienteSeleccionadoNombre = useMemo(() => {
     const id = Number(form.clienteId)
     if (!id) return ''
     return clientes.find((cliente) => cliente.id === id)?.nombre || ''
   }, [form.clienteId, clientes])
-
-  const mostrarAviso = useCallback(
-    (tone: NoticeState['tone'], title: string, message: string) => {
-      setNotice({ open: true, tone, title, message })
-    },
-    []
-  )
-
-  const cerrarAviso = useCallback(() => setNotice(NOTICE_INICIAL), [])
 
   const cargarClientes = useCallback(async () => {
     try {
@@ -272,6 +366,66 @@ export default function PortalTrabajoActual({
     }
   }, [mostrarAviso])
 
+  const seleccionarVisitaReporte = useCallback((visitaId: string, listado?: VisitaOperativa[]) => {
+    const listaTrabajo = listado ?? visitasReporteRef.current
+
+    if (visitaId === 'LIBRE') {
+      setModoLibreReporte(true)
+      setForm((prev) => ({
+        ...prev,
+        visitaId: 'LIBRE',
+        tecnicoId: obtenerUsuarioActualId(user) || prev.tecnicoId || '',
+      }))
+      return
+    }
+
+    setModoLibreReporte(false)
+
+    const visita = listaTrabajo.find((item) => String(item.id) === visitaId)
+
+    if (!visita) {
+      setForm((prev) => ({ ...prev, visitaId }))
+      return
+    }
+
+    const maquina = obtenerMaquinaPrincipalVisita(visita)
+
+    setForm((prev) => ({
+      ...prev,
+      visitaId: String(visita.id),
+      clienteId: String(visita.clienteId),
+      tecnicoId: obtenerUsuarioActualId(user) || obtenerTecnicoPrincipalVisita(visita, prev.tecnicoId),
+      maquinaId: maquina?.id ? String(maquina.id) : '',
+    }))
+  }, [user])
+
+  const cargarVisitasReporte = useCallback(async () => {
+    if (!user?.id) return
+
+    try {
+      setLoadingVisitasReporte(true)
+      const filtrosBase = esTecnico ? { tecnicoId: user.id, sinReporte: true } : { sinReporte: true }
+      const [pendientes, enProceso] = await Promise.all([
+        obtenerVisitas({ ...filtrosBase, estado: 'PENDIENTE' }),
+        obtenerVisitas({ ...filtrosBase, estado: 'EN_PROCESO' }),
+      ])
+      const mapa = new Map<number, VisitaOperativa>()
+      ;[...pendientes, ...enProceso].forEach((visita) => mapa.set(visita.id, visita))
+      const data = Array.from(mapa.values())
+      setVisitasReporte(data)
+      visitasReporteRef.current = data
+
+      if (initialVisitaId) {
+        seleccionarVisitaReporte(initialVisitaId, data)
+      }
+    } catch (err) {
+      console.error(err)
+      mostrarAviso('error', 'Visitas', 'No se pudieron cargar las visitas para el reporte.')
+    } finally {
+      setLoadingVisitasReporte(false)
+    }
+  }, [esTecnico, initialVisitaId, mostrarAviso, seleccionarVisitaReporte, user?.id])
+
   useEffect(() => {
     if ((vista === 'crear' || vista === 'cliente' || vista === 'maquina') && !clientes.length) {
       void cargarClientes()
@@ -316,13 +470,48 @@ export default function PortalTrabajoActual({
   }, [vista, tecnicos.length, procedimientos.length, hallazgosCatalogo.length, cargarCatalogosReporte])
 
   useEffect(() => {
-    if (!user?.id) return
+    if (vista === 'crear') {
+      void cargarVisitasReporte()
+    }
+  }, [vista, cargarVisitasReporte])
+
+
+  useEffect(() => {
+    async function cargarDetalleVisitaInicial() {
+      if (vista !== 'detalle-visita' || !initialVisitaId) return
+
+      try {
+        const visitas = await obtenerVisitas()
+        const encontrada = visitas.find((item) => String(item.id) === String(initialVisitaId)) || null
+        setVisitaDetalle(encontrada)
+      } catch (err) {
+        console.error(err)
+        mostrarAviso('error', 'Visita', 'No se pudo cargar el detalle de la visita.')
+      }
+    }
+
+    void cargarDetalleVisitaInicial()
+  }, [vista, initialVisitaId, mostrarAviso])
+
+  useEffect(function revalidarTecnicoDesdeLogin() {
+    if (vista !== 'crear') return
+    const usuarioActualId = obtenerUsuarioActualId(user)
+    if (!usuarioActualId) return
+
+    setForm((prev) => (prev.tecnicoId === usuarioActualId ? prev : {
+      ...prev,
+      tecnicoId: usuarioActualId,
+    }))
+ }, [vista, user])
+  useEffect(() => {
+    const usuarioActualId = obtenerUsuarioActualId(user)
+    if (!usuarioActualId) return
 
     setForm((prev) => ({
       ...prev,
-      tecnicoId: prev.tecnicoId || String(user.id),
+      tecnicoId: usuarioActualId,
     }))
-  }, [user?.id])
+  }, [user])
 
   useEffect(() => {
     if (vista !== 'maquina') return
@@ -351,8 +540,18 @@ export default function PortalTrabajoActual({
   function actualizarCampo(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target
 
+    if (name === 'visitaId') {
+      seleccionarVisitaReporte(value)
+      return
+    }
+
     if (name === 'clienteId') {
-      setForm((prev) => ({ ...prev, clienteId: value, maquinaId: '', visitaId: '' }))
+      setForm((prev) => ({
+        ...prev,
+        clienteId: value,
+        maquinaId: '',
+        visitaId: prev.visitaId === 'LIBRE' ? 'LIBRE' : '',
+      }))
       return
     }
 
@@ -403,14 +602,16 @@ export default function PortalTrabajoActual({
   }
 
   function limpiarFormulario() {
-    setForm((prev) => ({
-      ...FORM_REPORTE_INICIAL,
-      tecnicoId: prev.tecnicoId || String(user?.id || ''),
-    }))
+    setModoLibreReporte(false)
+    setForm({
+  ...FORM_REPORTE_INICIAL,
+  tecnicoId: obtenerUsuarioActualId(user),
+})
     setHallazgosSeleccionados([])
     setAnexos([])
     setCategoriasAbiertas([])
     setMaquinasCliente([])
+    visitaLibreTemporalRef.current = null
   }
 
   function limpiarFormularioCliente() {
@@ -548,6 +749,10 @@ export default function PortalTrabajoActual({
         observaciones: formMaquina.observaciones.trim() || undefined,
       })
 
+      if (!nuevaMaquina?.id) {
+        throw new Error('La máquina se guardó, pero no se recibió el ID para actualizar el formulario.')
+      }
+
       if (form.clienteId) {
         await cargarMaquinasPorCliente(form.clienteId)
       }
@@ -577,17 +782,51 @@ export default function PortalTrabajoActual({
 
   async function guardarReporteFrontend() {
     try {
-      if (!form.visitaId) throw new Error('Debes seleccionar la visita.')
+      if (!form.visitaId) throw new Error('Debes seleccionar una visita asignada o usar modo libre.')
       if (!form.clienteId) throw new Error('Debes seleccionar el cliente.')
       if (!form.maquinaId) throw new Error('Debes seleccionar la máquina.')
-      if (!form.tecnicoId) throw new Error('Debes seleccionar el técnico.')
+      const tecnicoIdActual = obtenerUsuarioActualId(user) || form.tecnicoId
+      if (!tecnicoIdActual) throw new Error('No se pudo identificar el usuario que genera el reporte.')
       if (!form.procedimientoId) throw new Error('Debes seleccionar la actividad.')
-      if (!hallazgosSeleccionados.length) throw new Error('Debes seleccionar al menos un hallazgo.')
+
+      if (esTecnico && form.visitaId !== 'LIBRE') {
+        const visitaAsignada = visitasReporte.some((visita) => String(visita.id) === form.visitaId)
+        if (!visitaAsignada) {
+          throw new Error('Solo puedes generar reportes desde visitas asignadas a tu usuario o usar modo libre.')
+        }
+      }
 
       setGuardandoReporte(true)
 
+      let formFinal: FormReporte = { ...form, tecnicoId: tecnicoIdActual, hallazgosSeleccionados, anexos }
+
+      if (form.visitaId === 'LIBRE') {
+        const llaveVisitaLibre = `${form.clienteId}-${form.maquinaId}-${tecnicoIdActual}`
+        let visitaIdLibre = visitaLibreTemporalRef.current?.key === llaveVisitaLibre
+          ? visitaLibreTemporalRef.current.visitaId
+          : ''
+
+        if (!visitaIdLibre) {
+          const visitaLibre = await crearVisita({
+            clienteId: Number(form.clienteId),
+            tecnicoId: Number(tecnicoIdActual),
+            tipoVisita: 'Visita libre',
+            motivo: 'Reporte técnico generado en modo libre.',
+            fechaProgramada: new Date().toISOString(),
+            observaciones: 'Visita libre creada automáticamente desde el formulario de reporte.',
+            requiereCotizacion: false,
+          })
+
+          await asociarMaquinasAVisita(visitaLibre.id, [{ maquinaId: Number(form.maquinaId) }])
+          visitaIdLibre = String(visitaLibre.id)
+          visitaLibreTemporalRef.current = { key: llaveVisitaLibre, visitaId: visitaIdLibre }
+        }
+
+        formFinal = { ...formFinal, visitaId: visitaIdLibre }
+      }
+
       const respuesta = await crearReporteDesdeFormulario({
-        form: { ...form, hallazgosSeleccionados, anexos },
+        form: formFinal,
         procedimientos,
         hallazgosCatalogo,
       })
@@ -596,6 +835,8 @@ export default function PortalTrabajoActual({
       setFormCierre(CIERRE_REPORTE_INICIAL)
       setMostrarFormularioCierre(false)
       setVista('detalle')
+      visitaLibreTemporalRef.current = null
+      void cargarVisitasReporte()
       mostrarAviso('success', 'Reporte creado', `Reporte guardado correctamente. Reporte #${respuesta.numeroReporte}`)
     } catch (err) {
       console.error(err)
@@ -627,6 +868,7 @@ export default function PortalTrabajoActual({
       setReporte(respuesta)
       setFormCierre(CIERRE_REPORTE_INICIAL)
       setMostrarFormularioCierre(false)
+      void cargarVisitasReporte()
       mostrarAviso('success', 'Cierre guardado', 'El cierre del reporte se guardó correctamente.')
     } catch (err) {
       console.error(err)
@@ -635,6 +877,82 @@ export default function PortalTrabajoActual({
     } finally {
       setGuardandoCierre(false)
     }
+  }
+
+  function valorDetalleVisita(valor?: string | number | null) {
+    return valor === null || valor === undefined || String(valor).trim() === '' ? 'Sin dato' : String(valor)
+  }
+
+  function fechaDetalleVisita(valor?: string | null) {
+    if (!valor) return 'Fecha pendiente'
+    const fecha = new Date(valor)
+    return Number.isNaN(fecha.getTime()) ? 'Fecha pendiente' : fecha.toLocaleString()
+  }
+
+  function textoMaquinaDetalleVisita(visita: VisitaOperativa | null) {
+    const maquina = visita?.maquinas?.[0]?.maquina
+    if (!maquina) return 'Sin máquina asociada'
+    return [maquina.codigoInterno, maquina.marca, maquina.modelo, maquina.serie, maquina.area]
+      .filter((item) => item && String(item).trim())
+      .join(' · ') || `Máquina #${maquina.id || ''}`
+  }
+
+  function renderDetalleVisita() {
+    if (!visitaDetalle) {
+      return (
+        <section className="panel compactFormPanel">
+          <h2>Detalle de visita</h2>
+          <p className="textoIntroCompacto">Cargando información de la visita...</p>
+          <div className="barraAcciones">
+            <button className="btn btnGhost" type="button" onClick={irAlMenu}>Volver al panel</button>
+          </div>
+        </section>
+      )
+    }
+
+    const visitaConDetalle = visitaDetalle as VisitaDetalleOperativa
+    const orden = visitaConDetalle.ordenServicio || {}
+    const cliente = visitaConDetalle.cliente || {}
+    const maquina = visitaConDetalle.maquinas?.[0]?.maquina || {}
+    const reportesVisita = visitaConDetalle.reportes || []
+
+    return (
+      <section className="panel compactFormPanel">
+        <div className="compactFormHeader">
+          <h2>{visitaDetalle.numeroVisita || `Visita #${visitaDetalle.id}`}</h2>
+          <p className="textoIntroCompacto">Detalle operativo para revisar cliente, dirección, máquina, técnico, estado y reporte relacionado.</p>
+        </div>
+
+        <div className="visitDetailBox">
+          <div className="visitDetailHeader">
+            <strong>Datos de visita</strong>
+            <span className="statusPill">{valorDetalleVisita(visitaDetalle.estado || 'PENDIENTE')}</span>
+          </div>
+          <div className="visitDetailGrid">
+            <div><span>Cliente</span><strong>{valorDetalleVisita(cliente.nombre)}</strong></div>
+            <div><span>Técnico</span><strong>{valorDetalleVisita(visitaDetalle.tecnico?.nombre)}</strong></div>
+            <div><span>Contacto</span><strong>{valorDetalleVisita(orden.contactoNombre)}</strong></div>
+            <div><span>Teléfono</span><strong>{valorDetalleVisita(orden.telefonoContacto || cliente.telefono)}</strong></div>
+            <div><span>Correo</span><strong>{valorDetalleVisita(orden.correoContacto || cliente.correo)}</strong></div>
+            <div><span>Fecha / hora</span><strong>{fechaDetalleVisita(visitaDetalle.fechaVisita)}</strong></div>
+            <div><span>Tipo</span><strong>{valorDetalleVisita(visitaDetalle.tipoVisita || orden.tipoSolicitud)}</strong></div>
+            <div><span>Máquina</span><strong>{textoMaquinaDetalleVisita(visitaDetalle)}</strong></div>
+            <div className="visitDetailFull"><span>Dirección</span><strong>{valorDetalleVisita(orden.ubicacionServicio || cliente.direccion || cliente.ubicacion || maquina.direccionExacta)}</strong></div>
+            <div className="visitDetailFull"><span>Motivo / descripción</span><strong>{valorDetalleVisita(visitaDetalle.motivoVisita || orden.descripcionProblema)}</strong></div>
+            <div className="visitDetailFull"><span>Observaciones</span><strong>{valorDetalleVisita(visitaDetalle.observaciones)}</strong></div>
+          </div>
+        </div>
+
+        <div className="barraAcciones barraAccionesResponsive">
+          <button className="btn btnGhost" type="button" onClick={irAlMenu}>Volver al panel</button>
+          {reportesVisita.length ? (
+            <button className="btn btnPrimario" type="button" onClick={() => { navigate(`/portal/reportes?abrir=detalle&context=dashboard&reporteId=${reportesVisita[0]?.id}`) }}>Ver reporte</button>
+          ) : (
+            <button className="btn btnPrimario" type="button" onClick={() => { navigate(`/portal/reportes?abrir=crear&context=dashboard&visitaId=${visitaDetalle.id}`) }}>Crear reporte</button>
+          )}
+        </div>
+      </section>
+    )
   }
 
   function renderInicio() {
@@ -667,25 +985,16 @@ export default function PortalTrabajoActual({
           ? 'Registrar máquina'
           : vista === 'detalle'
             ? `Reporte #${reporte?.numeroReporte || ''}`.trim()
-            : 'Crear reporte'
-
-    const descripcion =
-      vista === 'cliente'
-        ? 'Alta rápida para continuar después con máquinas, visitas y reportes.'
-        : vista === 'maquina'
-          ? 'Registro operativo de la máquina sin pedir ID crudo al usuario.'
-          : vista === 'detalle'
-            ? 'Revisa el detalle del reporte y registra el cierre cuando corresponda.'
-            : 'Completa el flujo técnico sin navegación duplicada ni pantallas intermedias.'
+            : vista === 'detalle-visita'
+              ? 'Detalle de visita'
+              : 'Crear reporte'
 
     return (
-      <section className="panel directFlowHeader">
+      <section className="panel directFlowHeader directFlowHeaderSimple">
         <div className="directFlowHeaderBrand">
           <img src={logoEr} alt="ER" className="directFlowLogo" />
           <div>
-            <span className="sectionCaption">ER Operaciones</span>
             <h2>{titulo}</h2>
-            <p className="textoIntroCompacto">{descripcion}</p>
           </div>
         </div>
       </section>
@@ -699,14 +1008,20 @@ export default function PortalTrabajoActual({
 
         {vista === 'inicio' && renderInicio()}
 
+        {vista === 'detalle-visita' && renderDetalleVisita()}
+
         {vista === 'crear' && (
           <FormularioReporte
             form={form}
             tecnicos={tecnicos}
+            usuarioActual={user}
             clientes={clientes}
             maquinasCliente={maquinasCliente}
             procedimientos={procedimientos}
             hallazgosAgrupados={hallazgosAgrupados}
+            visitasReporte={visitasReporte}
+            loadingVisitasReporte={loadingVisitasReporte}
+            modoLibreReporte={modoLibreReporte}
             hallazgosSeleccionados={hallazgosSeleccionados}
             categoriasAbiertas={categoriasAbiertas}
             anexos={anexos}
@@ -714,6 +1029,7 @@ export default function PortalTrabajoActual({
             loadingMaquinas={loadingMaquinas}
             loadingCatalogos={loadingCatalogosReporte}
             saving={guardandoReporte}
+            canOpenCliente={modoLibreReporte || user?.role !== 'TECNICO'}
             onChange={actualizarCampo}
             onToggleHallazgo={cambiarHallazgo}
             onToggleCategoria={toggleCategoria}

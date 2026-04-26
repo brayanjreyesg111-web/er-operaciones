@@ -8,9 +8,28 @@ import TecnicoDashboard from '../pages/dashboard/TecnicoDashboard'
 import PublicPortalPage from '../pages/public/PublicPortalPage'
 import ReportesPage from '../pages/reportes/ReportesPage'
 
-function resolverRutaPorRol(role: string) {
-  if (role === 'ADMINISTRADOR') return '/portal/admin'
-  if (role === 'SUPERVISOR') return '/portal/supervisor'
+function normalizarRol(role?: string | null) {
+  const limpio = String(role || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toUpperCase()
+
+  if (limpio.includes('ADMINISTRADOR') || limpio === 'ADMIN') return 'ADMINISTRADOR'
+  if (limpio.includes('SUPERVISOR')) return 'SUPERVISOR'
+  if (limpio.includes('FINANZAS') || limpio.includes('ADMINISTRATIVO')) return 'ADMINISTRATIVO_FINANZAS'
+  if (limpio.includes('CLIENTE')) return 'CLIENTE'
+  if (limpio.includes('TECNICO')) return 'TECNICO'
+
+  return limpio
+}
+
+function resolverRutaPorRol(role?: string | null) {
+  const rol = normalizarRol(role)
+  if (rol === 'ADMINISTRADOR') return '/portal/admin'
+  if (rol === 'SUPERVISOR') return '/portal/supervisor'
+  if (rol === 'ADMINISTRATIVO_FINANZAS') return '/portal/administrativo'
+  if (rol === 'CLIENTE') return '/portal/cliente'
   return '/portal/tecnico'
 }
 
@@ -31,8 +50,11 @@ function ProtectedRoute({
     return <Navigate to="/login" replace />
   }
 
-  if (!allowedRoles.includes(user.role)) {
-    return <Navigate to={resolverRutaPorRol(user.role)} replace />
+  const rolUsuario = normalizarRol(user.role)
+  const rolesPermitidos = allowedRoles.map(normalizarRol)
+
+  if (!rolesPermitidos.includes(rolUsuario)) {
+    return <Navigate to={resolverRutaPorRol(rolUsuario)} replace />
   }
 
   return <>{children}</>
@@ -62,7 +84,7 @@ export default function AppRouter() {
       <Route
         path="/portal/admin"
         element={
-          <ProtectedRoute allowedRoles={[ 'ADMINISTRADOR' ]}>
+          <ProtectedRoute allowedRoles={['ADMINISTRADOR']}>
             <AdminDashboard />
           </ProtectedRoute>
         }
@@ -71,7 +93,7 @@ export default function AppRouter() {
       <Route
         path="/portal/supervisor"
         element={
-          <ProtectedRoute allowedRoles={[ 'SUPERVISOR', 'ADMINISTRADOR' ]}>
+          <ProtectedRoute allowedRoles={['SUPERVISOR', 'ADMINISTRADOR']}>
             <SupervisorDashboard />
           </ProtectedRoute>
         }
@@ -80,7 +102,7 @@ export default function AppRouter() {
       <Route
         path="/portal/tecnico"
         element={
-          <ProtectedRoute allowedRoles={[ 'TECNICO', 'SUPERVISOR', 'ADMINISTRADOR' ]}>
+          <ProtectedRoute allowedRoles={['TECNICO', 'SUPERVISOR', 'ADMINISTRADOR']}>
             <TecnicoDashboard />
           </ProtectedRoute>
         }
@@ -89,7 +111,7 @@ export default function AppRouter() {
       <Route
         path="/portal/reportes"
         element={
-          <ProtectedRoute allowedRoles={[ 'TECNICO', 'SUPERVISOR', 'ADMINISTRADOR' ]}>
+          <ProtectedRoute allowedRoles={['TECNICO', 'SUPERVISOR', 'ADMINISTRADOR']}>
             <ReportesPage />
           </ProtectedRoute>
         }

@@ -12,6 +12,23 @@ type Props = {
   items: ActionItem[]
 }
 
+function abrirSeccion(targetId?: string) {
+  if (!targetId) return
+
+  window.setTimeout(() => {
+    const elemento = document.getElementById(targetId)
+    if (!elemento) return
+
+    if (elemento instanceof HTMLDetailsElement && !elemento.open) {
+      const summary = elemento.querySelector('summary') as HTMLElement | null
+      if (summary) summary.click()
+      else elemento.open = true
+    }
+
+    elemento.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, 40)
+}
+
 export default function RoleActionBar({ items }: Props) {
   return (
     <nav className="roleActionBar" aria-label="Acciones del portal">
@@ -33,7 +50,15 @@ export default function RoleActionBar({ items }: Props) {
         }
 
         return (
-          <a key={item.label} className={className} href={`#${item.targetId || ''}`}>
+          <a
+            key={item.label}
+            className={className}
+            href={`#${item.targetId || ''}`}
+            onClick={(event) => {
+              event.preventDefault()
+              abrirSeccion(item.targetId)
+            }}
+          >
             {item.label}
           </a>
         )

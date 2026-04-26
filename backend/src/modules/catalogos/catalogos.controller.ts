@@ -1,14 +1,15 @@
 import type { Request, Response } from "express";
 import {
-  listarCiudadesPorDepartamento,
-  listarDepartamentos,
-  listarHallazgos,
-  listarMarcas,
-  listarProcedimientos,
-  listarRefrigerantes,
   listarTecnicos,
+  listarUsuariosOperativos,
+  listarProcedimientos,
+  listarHallazgos,
   listarTiposUnidad,
+  listarMarcas,
+  listarRefrigerantes,
   listarUnidadesMedidaCarga,
+  listarDepartamentos,
+  listarCiudadesPorDepartamento,
 } from "./catalogos.service";
 
 export async function listarTiposUnidadController(_req: Request, res: Response) {
@@ -84,6 +85,16 @@ export async function listarTecnicosController(_req: Request, res: Response) {
   } catch (error) {
     console.error("Error listando técnicos:", error);
     return res.status(500).json({ ok: false, mensaje: "No se pudieron listar los técnicos." });
+  }
+}
+
+export async function listarUsuariosOperativosController(_req: Request, res: Response) {
+  try {
+    const data = await listarUsuariosOperativos();
+    return res.json({ ok: true, data });
+  } catch (error) {
+    console.error("Error listando usuarios operativos:", error);
+    return res.status(500).json({ ok: false, mensaje: "No se pudieron listar los usuarios operativos." });
   }
 }
 

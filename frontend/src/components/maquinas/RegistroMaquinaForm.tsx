@@ -61,6 +61,7 @@ export default function RegistroMaquinaForm({
   onSave,
   backLabel = 'Regresar',
 }: Props) {
+
   return (
     <section className="panel compactFormPanel">
       <div className="bloqueFormulario compactOnlyFormBlock">

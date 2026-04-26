@@ -48,50 +48,67 @@ export async function listarCiudadesPorDepartamento(departamentoId: number) {
   });
 }
 
-export async function listarTecnicos() {
-  const tecnicos = await prisma.user.findMany({
-    where: {
-      activo: true,
-      OR: [
-        {
-          role: {
-            nombre: {
-              contains: "tecn",
-              mode: "insensitive",
-            },
-          },
-        },
-        {
-          role: {
-            nombre: {
-              contains: "super",
-              mode: "insensitive",
-            },
-          },
-        },
-      ],
-    },
-    orderBy: { nombre: "asc" },
-    select: {
-      id: true,
-      nombre: true,
-      email: true,
-    },
-  });
+function rolOperativo(nombre?: string | null) {
+  const limpio = String(nombre || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toUpperCase();
 
-  if (tecnicos.length > 0) {
-    return tecnicos;
-  }
+  return (
+    limpio.includes("TECN") ||
+    limpio.includes("SUPERV") ||
+    limpio.includes("ADMIN") ||
+    limpio.includes("OPER")
+  );
+}
 
+function usuarioOperativoSelect() {
+  return {
+    id: true,
+    nombre: true,
+    email: true,
+    role: { select: { id: true, nombre: true } },
+  } as const;
+}
+
+function mapearUsuarioOperativo(usuario: {
+  id: number;
+  nombre: string;
+  email: string;
+  role?: { id?: number; nombre?: string | null } | null;
+}) {
+  const roleLabel = usuario.role?.nombre ?? null;
+  return {
+    id: usuario.id,
+    nombre: usuario.nombre,
+    email: usuario.email,
+    role: roleLabel,
+    roleLabel,
+    label: roleLabel ? `${usuario.nombre} · ${roleLabel}` : usuario.nombre,
+  };
+}
+
+async function listarUsuariosActivos() {
   return prisma.user.findMany({
     where: { activo: true },
-    orderBy: { nombre: "asc" },
-    select: {
-      id: true,
-      nombre: true,
-      email: true,
-    },
+    orderBy: [{ nombre: "asc" }, { email: "asc" }],
+    select: usuarioOperativoSelect(),
   });
+}
+
+export async function listarTecnicos() {
+  const usuarios = await listarUsuariosActivos();
+  const filtrados = usuarios.filter((usuario) => rolOperativo(usuario.role?.nombre));
+  const base = filtrados.length ? filtrados : usuarios;
+  return base.map(mapearUsuarioOperativo);
+}
+
+export async function listarUsuariosOperativos() {
+  const usuarios = await listarUsuariosActivos();
+  const filtrados = usuarios.filter((usuario) => rolOperativo(usuario.role?.nombre));
+  const base = filtrados.length ? filtrados : usuarios;
+  return base.map(mapearUsuarioOperativo);
 }
 
 export async function listarProcedimientos() {

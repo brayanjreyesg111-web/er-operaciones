@@ -1,0 +1,403 @@
+{
+  "meta": {
+    "generadoEn": "2026-04-24T17:53:47.690Z",
+    "modulo": "reportes",
+    "version": 5
+  },
+  "reporte": {
+    "id": 14,
+    "numeroReporte": "378",
+    "visitaId": 5,
+    "clienteId": 8,
+    "tecnicoId": 3,
+    "maquinaId": 7,
+    "tipoUnidadId": null,
+    "procedimientoId": 8,
+    "tipoReporte": "individual",
+    "conclusiones": "Area de conclusiones",
+    "observaciones": "Area de Observaciones",
+    "psi": "12",
+    "amperaje": "8",
+    "requiereCotizacion": false,
+    "estado": "generado",
+    "fechaReporte": "2026-04-24T17:53:44.863Z",
+    "createdAt": "2026-04-24T17:53:44.869Z",
+    "updatedAt": "2026-04-24T17:53:44.869Z",
+    "urlPdf": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\01_Entregable_Cliente\\Reporte_378.pdf"
+  },
+  "relaciones": {
+    "visita": {
+      "id": 5,
+      "numeroVisita": "VIS-0001",
+      "ordenServicioId": 2,
+      "clienteId": 8,
+      "tecnicoId": 3,
+      "actividadId": null,
+      "tipoVisita": "Revison de la unidad",
+      "motivoVisita": "revision de secador de aire",
+      "resultadoBreve": null,
+      "estado": "PENDIENTE",
+      "motivoEstado": null,
+      "requiereCotizacion": true,
+      "esVisitaLibre": false,
+      "fechaVisita": "2026-05-01T03:51:00.000Z",
+      "horaInicio": null,
+      "horaFin": null,
+      "observaciones": "Revision de la unidad",
+      "createdAt": "2026-04-24T03:52:33.617Z",
+      "updatedAt": "2026-04-24T03:52:33.617Z"
+    },
+    "cliente": {
+      "id": 8,
+      "nombre": "CEMCOOLL",
+      "rtn": "0502198700148866",
+      "contactoNombre": "Bernardo",
+      "telefono": "31445678qq",
+      "correo": "n",
+      "direccion": null,
+      "ubicacion": null,
+      "departamentoId": 6,
+      "ciudadId": 12,
+      "activo": true,
+      "createdAt": "2026-04-14T21:55:59.662Z",
+      "updatedAt": "2026-04-14T21:55:59.662Z"
+    },
+    "tecnico": {
+      "id": 3,
+      "nombre": "Tecnico General",
+      "email": "tecnico@er.local",
+      "passwordHash": "$2b$10$qJk5dBHl2D0RpjShhn9VEeRQ4tcbjmaeUArMw0db/8HleLlyTLVkq",
+      "activo": true,
+      "roleId": 3,
+      "createdAt": "2026-04-15T18:05:25.890Z",
+      "updatedAt": "2026-04-15T18:05:25.890Z"
+    },
+    "maquina": {
+      "id": 7,
+      "clienteId": 8,
+      "tipoUnidadId": 4,
+      "marcaId": 1,
+      "refrigeranteId": 2,
+      "unidadMedidaCargaId": 1,
+      "departamentoId": 6,
+      "ciudadId": 12,
+      "codigoInterno": "CHILLER_LG_ND_123456789_SAN_PEDRO_SULA_SALA_DE_MAQUINAS",
+      "tipoEquipo": "CHILLER",
+      "marca": "LG",
+      "modelo": null,
+      "serie": "123456789",
+      "cargaRefrigeranteCantidad": "9",
+      "direccionExacta": "Desvio a la cafetalera",
+      "area": "Sala de maquinas",
+      "observaciones": null,
+      "activo": true,
+      "createdAt": "2026-04-14T21:58:28.206Z",
+      "updatedAt": "2026-04-14T21:58:28.206Z"
+    },
+    "tipoUnidad": null,
+    "procedimiento": {
+      "id": 8,
+      "codigo": "P-08",
+      "nombre": "Puesta en marcha",
+      "descripcionCompletaPdf": "1. Revisión general previa al arranque.\r\n2. Confirmación de conexiones, componentes y condiciones operativas.\r\n3. Arranque controlado del equipo.\r\n4. Toma de parámetros iniciales.\r\n5. Verificación de estabilidad en operación.\r\n6. Registro de condiciones de puesta en marcha.",
+      "activo": true,
+      "createdAt": "2026-04-06T22:25:41.903Z",
+      "updatedAt": "2026-04-06T22:25:41.903Z"
+    }
+  },
+  "detallesMaquinas": [
+    {
+      "id": 14,
+      "reporteId": 14,
+      "maquinaId": 7,
+      "tipoUnidadId": 4,
+      "procedimientoId": 8,
+      "procedimiento": null,
+      "tituloActividad": "Puesta en marcha",
+      "descripcionActividadPdf": "1. Revisión general previa al arranque.\r\n2. Confirmación de conexiones, componentes y condiciones operativas.\r\n3. Arranque controlado del equipo.\r\n4. Toma de parámetros iniciales.\r\n5. Verificación de estabilidad en operación.\r\n6. Registro de condiciones de puesta en marcha.",
+      "hallazgosTexto": "H-004: Capacitor fuera de rango | H-005: Terminal floja en contactor | H-006: Protector térmico disparado | H-07: Consumo de amperaje elevado. | H-010: Equipo operando con observaciones menores | H-18: Equipo requiere limpieza general. | H-19: Se observan señales de intervención previa. | H-20: Sin hallazgos críticos al momento de la visita. | H-14: Equipo opera pero no alcanza temperatura requerida. | H-17: Se recomienda cotización para reparación mayor. | H-16: Operación intermitente.",
+      "diagnostico": null,
+      "trabajoRealizado": null,
+      "recomendaciones": null,
+      "psi": "12",
+      "amperaje": "8",
+      "observaciones": "Area de Observaciones",
+      "createdAt": "2026-04-24T17:53:44.912Z",
+      "updatedAt": "2026-04-24T17:53:44.912Z",
+      "maquina": {
+        "id": 7,
+        "clienteId": 8,
+        "tipoUnidadId": 4,
+        "marcaId": 1,
+        "refrigeranteId": 2,
+        "unidadMedidaCargaId": 1,
+        "departamentoId": 6,
+        "ciudadId": 12,
+        "codigoInterno": "CHILLER_LG_ND_123456789_SAN_PEDRO_SULA_SALA_DE_MAQUINAS",
+        "tipoEquipo": "CHILLER",
+        "marca": "LG",
+        "modelo": null,
+        "serie": "123456789",
+        "cargaRefrigeranteCantidad": "9",
+        "direccionExacta": "Desvio a la cafetalera",
+        "area": "Sala de maquinas",
+        "observaciones": null,
+        "activo": true,
+        "createdAt": "2026-04-14T21:58:28.206Z",
+        "updatedAt": "2026-04-14T21:58:28.206Z"
+      },
+      "tipoUnidad": {
+        "id": 4,
+        "codigo": "TU-004",
+        "nombre": "CHILLER",
+        "descripcion": "Chiller industrial",
+        "activo": true,
+        "createdAt": "2026-04-06T22:06:04.109Z",
+        "updatedAt": "2026-04-06T22:06:04.109Z"
+      },
+      "procedimientoCatalogo": {
+        "id": 8,
+        "codigo": "P-08",
+        "nombre": "Puesta en marcha",
+        "descripcionCompletaPdf": "1. Revisión general previa al arranque.\r\n2. Confirmación de conexiones, componentes y condiciones operativas.\r\n3. Arranque controlado del equipo.\r\n4. Toma de parámetros iniciales.\r\n5. Verificación de estabilidad en operación.\r\n6. Registro de condiciones de puesta en marcha.",
+        "activo": true,
+        "createdAt": "2026-04-06T22:25:41.903Z",
+        "updatedAt": "2026-04-06T22:25:41.903Z"
+      },
+      "hallazgos": [
+        {
+          "id": 104,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 24,
+          "codigoHallazgo": "H-004",
+          "descripcionHallazgo": "Capacitor fuera de rango",
+          "createdAt": "2026-04-24T17:53:44.937Z",
+          "hallazgoCatalogo": {
+            "id": 24,
+            "codigo": "H-004",
+            "categoria": "Eléctrico",
+            "descripcion": "Capacitor fuera de rango",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 105,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 25,
+          "codigoHallazgo": "H-005",
+          "descripcionHallazgo": "Terminal floja en contactor",
+          "createdAt": "2026-04-24T17:53:44.952Z",
+          "hallazgoCatalogo": {
+            "id": 25,
+            "codigo": "H-005",
+            "categoria": "Eléctrico",
+            "descripcion": "Terminal floja en contactor",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 106,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 26,
+          "codigoHallazgo": "H-006",
+          "descripcionHallazgo": "Protector térmico disparado",
+          "createdAt": "2026-04-24T17:53:44.958Z",
+          "hallazgoCatalogo": {
+            "id": 26,
+            "codigo": "H-006",
+            "categoria": "Eléctrico",
+            "descripcion": "Protector térmico disparado",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 107,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 7,
+          "codigoHallazgo": "H-07",
+          "descripcionHallazgo": "Consumo de amperaje elevado.",
+          "createdAt": "2026-04-24T17:53:44.963Z",
+          "hallazgoCatalogo": {
+            "id": 7,
+            "codigo": "H-07",
+            "categoria": "Eléctrico",
+            "descripcion": "Consumo de amperaje elevado.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 108,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 30,
+          "codigoHallazgo": "H-010",
+          "descripcionHallazgo": "Equipo operando con observaciones menores",
+          "createdAt": "2026-04-24T17:53:44.968Z",
+          "hallazgoCatalogo": {
+            "id": 30,
+            "codigo": "H-010",
+            "categoria": "General",
+            "descripcion": "Equipo operando con observaciones menores",
+            "activo": true,
+            "createdAt": "2026-04-14T17:28:35.315Z",
+            "updatedAt": "2026-04-14T17:28:43.592Z"
+          }
+        },
+        {
+          "id": 109,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 18,
+          "codigoHallazgo": "H-18",
+          "descripcionHallazgo": "Equipo requiere limpieza general.",
+          "createdAt": "2026-04-24T17:53:44.973Z",
+          "hallazgoCatalogo": {
+            "id": 18,
+            "codigo": "H-18",
+            "categoria": "General",
+            "descripcion": "Equipo requiere limpieza general.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 110,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 19,
+          "codigoHallazgo": "H-19",
+          "descripcionHallazgo": "Se observan señales de intervención previa.",
+          "createdAt": "2026-04-24T17:53:44.978Z",
+          "hallazgoCatalogo": {
+            "id": 19,
+            "codigo": "H-19",
+            "categoria": "General",
+            "descripcion": "Se observan señales de intervención previa.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 111,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 20,
+          "codigoHallazgo": "H-20",
+          "descripcionHallazgo": "Sin hallazgos críticos al momento de la visita.",
+          "createdAt": "2026-04-24T17:53:44.983Z",
+          "hallazgoCatalogo": {
+            "id": 20,
+            "codigo": "H-20",
+            "categoria": "General",
+            "descripcion": "Sin hallazgos críticos al momento de la visita.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 112,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 14,
+          "codigoHallazgo": "H-14",
+          "descripcionHallazgo": "Equipo opera pero no alcanza temperatura requerida.",
+          "createdAt": "2026-04-24T17:53:44.989Z",
+          "hallazgoCatalogo": {
+            "id": 14,
+            "codigo": "H-14",
+            "categoria": "Operación",
+            "descripcion": "Equipo opera pero no alcanza temperatura requerida.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 113,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 17,
+          "codigoHallazgo": "H-17",
+          "descripcionHallazgo": "Se recomienda cotización para reparación mayor.",
+          "createdAt": "2026-04-24T17:53:44.995Z",
+          "hallazgoCatalogo": {
+            "id": 17,
+            "codigo": "H-17",
+            "categoria": "Operación",
+            "descripcion": "Se recomienda cotización para reparación mayor.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        },
+        {
+          "id": 114,
+          "reporteDetalleMaquinaId": 14,
+          "hallazgoCatalogoId": 16,
+          "codigoHallazgo": "H-16",
+          "descripcionHallazgo": "Operación intermitente.",
+          "createdAt": "2026-04-24T17:53:45.000Z",
+          "hallazgoCatalogo": {
+            "id": 16,
+            "codigo": "H-16",
+            "categoria": "Operación",
+            "descripcion": "Operación intermitente.",
+            "activo": true,
+            "createdAt": "2026-04-06T22:26:37.884Z",
+            "updatedAt": "2026-04-06T22:26:37.884Z"
+          }
+        }
+      ]
+    }
+  ],
+  "anexos": [
+    {
+      "id": 68,
+      "reporteId": 14,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1777053225006_748854.jpg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\anexos\\1777053225006_748854.jpg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 956398,
+      "createdAt": "2026-04-24T17:53:45.011Z"
+    },
+    {
+      "id": 69,
+      "reporteId": 14,
+      "tipoArchivo": "imagen",
+      "nombreArchivo": "1777053225025_1363894.jpeg",
+      "urlArchivo": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\anexos\\1777053225025_1363894.jpeg",
+      "driveFileId": null,
+      "mimeType": "image/jpeg",
+      "tamanoBytes": 3177229,
+      "createdAt": "2026-04-24T17:53:45.028Z"
+    }
+  ],
+  "cierre": null,
+  "pdf": {
+    "rutaPdfInterno": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\pdf\\Reporte_378.pdf",
+    "rutaPdfEntregable": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\01_Entregable_Cliente\\Reporte_378.pdf"
+  },
+  "storage": {
+    "numeroReporte": "378",
+    "nombreCarpetaReporte": "Reporte_378",
+    "rutas": {
+      "baseStorageDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage",
+      "reportesBaseDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes",
+      "reporteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378",
+      "entregableClienteDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\01_Entregable_Cliente",
+      "internoDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno",
+      "anexosDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\anexos",
+      "firmasDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\firmas",
+      "pdfDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\pdf",
+      "jsonDir": "C:\\Users\\Braya\\Documents\\er_operaciones\\backend\\storage\\reportes\\Reporte_378\\99_Interno\\json"
+    },
+    "yaExistia": false
+  }
+}

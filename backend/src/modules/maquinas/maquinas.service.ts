@@ -19,12 +19,14 @@ type CrearMaquinaInput = {
 function slugSeguro(valor?: string | null): string {
   if (!valor) return "ND";
 
-  return valor
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
-    .toUpperCase() || "ND";
+  return (
+    valor
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toUpperCase() || "ND"
+  );
 }
 
 function construirCodigoInterno(params: {
@@ -45,17 +47,59 @@ function construirCodigoInterno(params: {
   ].join("_");
 }
 
+export async function listarMaquinas(filtros?: { clienteId?: number }) {
+  const clienteId =
+    filtros?.clienteId && Number.isInteger(filtros.clienteId) && filtros.clienteId > 0
+      ? filtros.clienteId
+      : undefined;
+
+  return prisma.maquina.findMany({
+    where: {
+      activo: true,
+      ...(clienteId ? { clienteId } : {}),
+    },
+    orderBy: { id: "desc" },
+    select: {
+      id: true,
+      clienteId: true,
+      codigoInterno: true,
+      tipoEquipo: true,
+      marca: true,
+      modelo: true,
+      serie: true,
+      area: true,
+      direccionExacta: true,
+      activo: true,
+      cliente: { select: { id: true, nombre: true } },
+      tipoUnidad: { select: { id: true, nombre: true } },
+      marcaCatalogo: { select: { id: true, nombre: true } },
+      refrigeranteCatalogo: { select: { id: true, codigo: true, nombre: true } },
+      departamento: { select: { id: true, nombre: true } },
+      ciudad: { select: { id: true, nombre: true } },
+    },
+  });
+}
+
 export async function crearMaquina(data: CrearMaquinaInput) {
   const tipoUnidad = data.tipoUnidadId
-    ? await prisma.tipoUnidad.findUnique({ where: { id: data.tipoUnidadId }, select: { nombre: true } })
+    ? await prisma.tipoUnidad.findUnique({
+        where: { id: data.tipoUnidadId },
+        select: { nombre: true },
+      })
     : null;
 
   const marca = data.marcaId
-    ? await prisma.marca.findUnique({ where: { id: data.marcaId }, select: { nombre: true } })
+    ? await prisma.marca.findUnique({
+        where: { id: data.marcaId },
+        select: { nombre: true },
+      })
     : null;
 
   const ciudad = data.ciudadId
-    ? await prisma.ciudad.findUnique({ where: { id: data.ciudadId }, select: { nombre: true, departamentoId: true } })
+    ? await prisma.ciudad.findUnique({
+        where: { id: data.ciudadId },
+        select: { nombre: true, departamentoId: true },
+      })
     : null;
 
   if (data.departamentoId && ciudad && ciudad.departamentoId !== data.departamentoId) {
@@ -93,6 +137,7 @@ export async function crearMaquina(data: CrearMaquinaInput) {
     },
     select: {
       id: true,
+      clienteId: true,
       codigoInterno: true,
       modelo: true,
       serie: true,
@@ -106,6 +151,7 @@ export async function obtenerMaquinaPorId(id: number) {
     where: { id },
     select: {
       id: true,
+      clienteId: true,
       codigoInterno: true,
       modelo: true,
       serie: true,
@@ -121,4 +167,3 @@ export async function obtenerMaquinaPorId(id: number) {
     },
   });
 }
-

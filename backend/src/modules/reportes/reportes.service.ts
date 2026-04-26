@@ -536,14 +536,14 @@ function construirAccionesReporte(reporte: {
 
 function resolverEstadoInicialReporte(data: CrearReporteInput): string {
   if (data.estado?.trim()) return data.estado.trim();
-  return "generado";
+  return "EMITIDO";
 }
 
 function resolverEstadoDesdeCierre(cierre?: CrearCierreInput | null): string {
-  if (!cierre) return "generado";
-  if (cierre.recibido) return "recibido";
-  if (cierre.motivoNoRecepcion) return "sin_recepcion";
-  return "generado";
+  if (!cierre) return "EMITIDO";
+  if (cierre.recibido) return "CERRADO";
+  if (cierre.motivoNoRecepcion) return "CERRADO";
+  return "EMITIDO";
 }
 
 async function obtenerReporteCompleto(id: number) {
@@ -673,6 +673,32 @@ export async function crearReporte(data: CrearReporteInput) {
 
   const rutaJsonInterno = guardarJsonReporte(numeroReporte, jsonInterno);
 
+  await prisma.visita.update({
+    where: { id: data.visitaId },
+    data: { estado: "EN_PROCESO", horaInicio: visita.horaInicio ?? new Date() },
+  });
+
+  if (visita.actividadId) {
+    const pasoReporte = await prisma.actividadPaso.findFirst({
+      where: { actividadId: visita.actividadId, tituloPaso: { contains: "reporte", mode: "insensitive" } },
+      select: { id: true },
+    });
+
+    if (pasoReporte) {
+      await prisma.actividadPaso.update({
+        where: { id: pasoReporte.id },
+        data: { estadoPaso: "HECHO", porcentajePaso: 100, fechaRealizacion: new Date(), realizadoPorId: tecnicoIdFinal },
+      });
+    }
+
+    await prisma.actividad.update({
+      where: { id: visita.actividadId },
+      data: { estado: "EN_PROCESO", fechaInicio: new Date(), progresoPorcentaje: 75 },
+    }).catch(async () => {
+      await prisma.actividad.update({ where: { id: visita.actividadId! }, data: { estado: "EN_PROCESO", fechaInicio: new Date() } });
+    });
+  }
+
   const reporteRespuesta = enriquecerUrlsReporte({
     ...reporte,
     estado: estadoInicial,
@@ -757,6 +783,25 @@ export async function cerrarReporte(
 
   if (!reporteFinal) {
     throw new Error("No se pudo obtener el reporte final.");
+  }
+
+  if (reporteFinal.visitaId) {
+    await prisma.visita.update({
+      where: { id: reporteFinal.visitaId },
+      data: { estado: "FINALIZADA", horaFin: new Date() },
+    });
+  }
+
+  if (reporteFinal.visita?.actividadId) {
+    await prisma.actividadPaso.updateMany({
+      where: { actividadId: reporteFinal.visita.actividadId },
+      data: { estadoPaso: "HECHO", porcentajePaso: 100, fechaRealizacion: new Date(), realizadoPorId: reporteFinal.tecnicoId },
+    }).catch(() => undefined);
+
+    await prisma.actividad.update({
+      where: { id: reporteFinal.visita.actividadId },
+      data: { estado: "COMPLETADA", progresoPorcentaje: 100, fechaFin: new Date() },
+    }).catch(() => undefined);
   }
 
   const reporteConUrls = enriquecerUrlsReporte({

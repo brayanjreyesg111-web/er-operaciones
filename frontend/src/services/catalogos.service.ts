@@ -59,3 +59,6 @@ export async function obtenerProcedimientos(): Promise<ProcedimientoOption[]> {
 export async function obtenerHallazgos(): Promise<HallazgoOption[]> {
   return fetchCatalogo<HallazgoOption>('/catalogos/hallazgos')
 }
+export async function obtenerUsuariosOperativos(): Promise<TecnicoOption[]> {
+  return fetchCatalogo<TecnicoOption>('/catalogos/usuarios-operativos')
+}
