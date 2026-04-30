@@ -6,7 +6,7 @@
   ReporteDetalle,
 } from '../types/reportes.types'
 
-const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 function limpiarBase64(data: string): string {
   return String(data || '').replace(/^data:.*;base64,/, '')
@@ -160,4 +160,5 @@ export async function cerrarReportePosterior(params: {
 export async function obtenerReportePorId(reporteId: number): Promise<ReporteDetalle> {
   return await fetchApi<ReporteDetalle>(`${API}/reportes/${reporteId}`)
 }
+
 

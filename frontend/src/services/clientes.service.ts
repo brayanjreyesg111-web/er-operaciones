@@ -1,4 +1,4 @@
-﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+﻿const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 type ClientePayload = {
   nombre: string
@@ -64,3 +64,4 @@ export async function crearCliente(payload: ClientePayload) {
 
   return json.data
 }
+

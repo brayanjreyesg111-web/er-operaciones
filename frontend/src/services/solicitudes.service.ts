@@ -1,4 +1,4 @@
-﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+﻿const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 export type CatalogoUbicacionItem = {
   id: number;
@@ -125,4 +125,5 @@ export async function listarSolicitudesPublicas(filtros?: { estado?: string; pen
 
   return json.data || []
 }
+
 

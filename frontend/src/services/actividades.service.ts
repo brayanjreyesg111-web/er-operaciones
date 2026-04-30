@@ -1,4 +1,4 @@
-﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+﻿const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 export type ActividadPaso = {
   id: number
@@ -164,4 +164,5 @@ export async function crearMensajeActividad(
 
   return leerJson<NonNullable<ActividadOperativa['mensajes']>[number]>(res)
 }
+
 

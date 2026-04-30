@@ -5,7 +5,7 @@ import type {
   TecnicoOption,
 } from '../types/reportes.types'
 
-const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 async function fetchCatalogo<T>(url: string): Promise<T[]> {
   const res = await fetch(`${API}${url}`)
@@ -62,4 +62,5 @@ export async function obtenerHallazgos(): Promise<HallazgoOption[]> {
 export async function obtenerUsuariosOperativos(): Promise<TecnicoOption[]> {
   return fetchCatalogo<TecnicoOption>('/catalogos/usuarios-operativos')
 }
+
 

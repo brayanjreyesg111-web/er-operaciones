@@ -1,6 +1,6 @@
 ﻿import type { CrearMaquinaResponse } from '../types/maquinas.types'
 
-const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 export type MaquinaResumen = {
   id: number
@@ -71,4 +71,5 @@ export async function crearMaquina(payload: {
   const data = await leerJson<CrearMaquinaResponse['data']>(res)
   return data
 }
+
 

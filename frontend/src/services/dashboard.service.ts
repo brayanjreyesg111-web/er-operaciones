@@ -1,4 +1,4 @@
-﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
+﻿const API = "https://slowly-work-dim-branches.trycloudflare.com/api";
 
 export type DashboardCliente = {
   id: number
@@ -482,4 +482,5 @@ export function textoMaquinaVisita(visita: DashboardVisita) {
 export function textoVisitaPrincipal(visita: DashboardVisita) {
   return visita.numeroVisita || `Visita #${visita.id}`
 }
+
 
