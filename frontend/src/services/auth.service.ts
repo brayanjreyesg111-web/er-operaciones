@@ -1,4 +1,4 @@
-const API = "http://localhost:3001/api";
+﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 export type LoginResponse = {
   token: string;
@@ -24,7 +24,7 @@ export async function loginRequest(email: string, password: string): Promise<Log
   const json = await res.json();
 
   if (!res.ok || !json?.ok) {
-    throw new Error(json?.mensaje || "No se pudo iniciar sesión.");
+    throw new Error(json?.mensaje || "No se pudo iniciar sesiÃ³n.");
   }
 
   return json.data;
@@ -40,8 +40,9 @@ export async function meRequest(token: string) {
   const json = await res.json();
 
   if (!res.ok || !json?.ok) {
-    throw new Error(json?.mensaje || "No se pudo validar la sesión.");
+    throw new Error(json?.mensaje || "No se pudo validar la sesiÃ³n.");
   }
 
   return json.data;
 }
+

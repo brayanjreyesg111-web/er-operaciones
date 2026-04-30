@@ -1,4 +1,4 @@
-const API = "http://localhost:3001/api";
+﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 export type CatalogoUbicacionItem = {
   id: number;
@@ -125,3 +125,4 @@ export async function listarSolicitudesPublicas(filtros?: { estado?: string; pen
 
   return json.data || []
 }
+

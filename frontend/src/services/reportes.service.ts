@@ -1,4 +1,4 @@
-import type {
+﻿import type {
   CierreReporteFormState,
   FormReporte,
   HallazgoOption,
@@ -6,7 +6,7 @@ import type {
   ReporteDetalle,
 } from '../types/reportes.types'
 
-const API = 'http://localhost:3001/api'
+const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 function limpiarBase64(data: string): string {
   return String(data || '').replace(/^data:.*;base64,/, '')
@@ -50,7 +50,7 @@ function obtenerVisitaObligatoria(form: FormReporte): number {
   const visitaId = Number(form.visitaId)
 
   if (!Number.isFinite(visitaId) || visitaId <= 0) {
-    throw new Error('Ahora el reporte debe crearse desde una visita existente. Ingresa un visitaId válido.')
+    throw new Error('Ahora el reporte debe crearse desde una visita existente. Ingresa un visitaId vÃ¡lido.')
   }
 
   return visitaId
@@ -140,7 +140,7 @@ export async function cerrarReportePosterior(params: {
             recibido: true,
             aprobado: true,
             nombreRecibe: cierre.nombreRecibe || 'Recibido digitalmente',
-            puestoRecibe: cierre.cargoRecibe || 'Recepción digital',
+            puestoRecibe: cierre.cargoRecibe || 'RecepciÃ³n digital',
             observaciones: cierre.observacionesRecepcion || 'Reporte recibido y aceptado de forma digital / a distancia.',
           }
         : {
@@ -160,3 +160,4 @@ export async function cerrarReportePosterior(params: {
 export async function obtenerReportePorId(reporteId: number): Promise<ReporteDetalle> {
   return await fetchApi<ReporteDetalle>(`${API}/reportes/${reporteId}`)
 }
+

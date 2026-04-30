@@ -1,4 +1,4 @@
-const API = 'http://localhost:3001/api'
+﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 export type DashboardCliente = {
   id: number
@@ -325,17 +325,17 @@ export function construirDashboardAdmin(base: DashboardBaseData): DashboardAdmin
     {
       label: 'Solicitudes por revisar',
       value: String(base.solicitudes.filter(solicitudRequiereGestion).length),
-      hint: 'Entradas nuevas del portal público pendientes de gestión.',
+      hint: 'Entradas nuevas del portal pÃºblico pendientes de gestiÃ³n.',
     },
     {
       label: 'Visitas / actividades abiertas',
       value: String(base.visitas.filter(visitaSigueActiva).length + base.actividades.filter(actividadSigueActiva).length),
-      hint: 'Visitas todavía no finalizadas o no atendidas por completo.',
+      hint: 'Visitas todavÃ­a no finalizadas o no atendidas por completo.',
     },
     {
       label: 'Reportes sin cierre',
       value: String(base.reportes.filter(reporteSinCierre).length),
-      hint: 'Documentos emitidos que todavía requieren cierre o recepción.',
+      hint: 'Documentos emitidos que todavÃ­a requieren cierre o recepciÃ³n.',
     },
   ]
 
@@ -366,9 +366,9 @@ export function construirDashboardSupervisor(base: DashboardBaseData): Dashboard
 
   const metrics: DashboardMetric[] = [
     {
-      label: 'Solicitudes nuevas / revisión',
+      label: 'Solicitudes nuevas / revisiÃ³n',
       value: String(base.solicitudes.filter(solicitudRequiereGestion).length),
-      hint: 'Bandeja inmediata para coordinación y asignación.',
+      hint: 'Bandeja inmediata para coordinaciÃ³n y asignaciÃ³n.',
     },
     {
       label: 'Visitas de hoy',
@@ -378,12 +378,12 @@ export function construirDashboardSupervisor(base: DashboardBaseData): Dashboard
     {
       label: 'Visitas pendientes',
       value: String(base.visitas.filter(visitaSigueActiva).length),
-      hint: 'Casos todavía activos en operación.',
+      hint: 'Casos todavÃ­a activos en operaciÃ³n.',
     },
     {
       label: 'Reportes sin cierre',
       value: String(base.reportes.filter(reporteSinCierre).length),
-      hint: 'Documentos que aún ocupan revisión o cierre operativo.',
+      hint: 'Documentos que aÃºn ocupan revisiÃ³n o cierre operativo.',
     },
   ]
 
@@ -439,7 +439,7 @@ export function construirDashboardTecnico(
     {
       label: 'Reportes sin cierre',
       value: String(base.reportes.filter((reporte) => reporteEsDelTecnico(reporte) && reporteSinCierre(reporte)).length),
-      hint: 'Reportes generados por tu usuario que aún requieren cierre.',
+      hint: 'Reportes generados por tu usuario que aÃºn requieren cierre.',
     },
     {
       label: 'Reportes con cierre',
@@ -449,7 +449,7 @@ export function construirDashboardTecnico(
             reporteEsDelTecnico(reporte) && !reporteSinCierre(reporte)
         ).length
       ),
-      hint: 'Reportes que ya tienen recibido o motivo de no recepción.',
+      hint: 'Reportes que ya tienen recibido o motivo de no recepciÃ³n.',
     },
   ]
 
@@ -470,15 +470,16 @@ export function textoSolicitudUbicacion(solicitud: DashboardSolicitud) {
 
 export function textoMaquinaVisita(visita: DashboardVisita) {
   const primera = visita.maquinas?.[0]?.maquina
-  if (!primera) return 'Sin máquina asociada todavía'
+  if (!primera) return 'Sin mÃ¡quina asociada todavÃ­a'
 
   const partes = [primera.codigoInterno, primera.marca, primera.modelo, primera.serie]
     .filter((item) => item && String(item).trim())
     .map((item) => String(item))
 
-  return partes.length ? partes.join(' · ') : `Máquina #${primera.id || ''}`
+  return partes.length ? partes.join(' Â· ') : `MÃ¡quina #${primera.id || ''}`
 }
 
 export function textoVisitaPrincipal(visita: DashboardVisita) {
   return visita.numeroVisita || `Visita #${visita.id}`
 }
+

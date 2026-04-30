@@ -1,4 +1,4 @@
-const API = 'http://localhost:3001/api'
+﻿const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 export type ActividadPaso = {
   id: number
@@ -164,3 +164,4 @@ export async function crearMensajeActividad(
 
   return leerJson<NonNullable<ActividadOperativa['mensajes']>[number]>(res)
 }
+

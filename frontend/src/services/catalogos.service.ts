@@ -1,11 +1,11 @@
-import type { CatalogoItem } from '../types/catalogos.types'
+﻿import type { CatalogoItem } from '../types/catalogos.types'
 import type {
   HallazgoOption,
   ProcedimientoOption,
   TecnicoOption,
 } from '../types/reportes.types'
 
-const API = 'http://localhost:3001/api'
+const API = (import.meta.env.VITE_API_URL || "http://localhost:3001") + "/api";
 
 async function fetchCatalogo<T>(url: string): Promise<T[]> {
   const res = await fetch(`${API}${url}`)
@@ -18,7 +18,7 @@ async function fetchCatalogo<T>(url: string): Promise<T[]> {
   const json = JSON.parse(raw) as { ok: boolean; data: T[] }
 
   if (!json.ok || !Array.isArray(json.data)) {
-    throw new Error('Respuesta inválida de catálogo.')
+    throw new Error('Respuesta invÃ¡lida de catÃ¡logo.')
   }
 
   return json.data
@@ -62,3 +62,4 @@ export async function obtenerHallazgos(): Promise<HallazgoOption[]> {
 export async function obtenerUsuariosOperativos(): Promise<TecnicoOption[]> {
   return fetchCatalogo<TecnicoOption>('/catalogos/usuarios-operativos')
 }
+
